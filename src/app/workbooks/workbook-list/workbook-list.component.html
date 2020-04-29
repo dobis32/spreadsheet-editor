@@ -1,0 +1,14 @@
+<h1>Workbook List</h1>
+<hr>
+<h3>Workbooks</h3>
+<ul>
+    <li *ngFor="let workbook of workbooks">{{ workbook.name }}</li>
+</ul>
+<hr>
+<h3>Add Workbook</h3>
+<h5>Workbook name:</h5>
+<form [formGroup]="workbookForm" (ngSubmit)="addWorkbook(workbookForm)">
+    <label for="name">Name</label>
+    <input type="text" formControlName="name">
+    <button>Add</button>
+</form>
