@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WorkbookListComponent } from './workbook-list.component';
-import { FormBuilder, FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('WorkbookListComponent', () => {
 	let component: WorkbookListComponent;
