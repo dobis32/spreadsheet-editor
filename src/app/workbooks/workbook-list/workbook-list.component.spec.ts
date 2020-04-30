@@ -2,6 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WorkbookListComponent } from './workbook-list.component';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FirestoreService } from 'src/app/services/firestore.service';
+import { of } from 'rxjs';
+import { mockWorkbookData } from '../../../assets/mockData';
+
+class MockFireStoreService {
+	getWorkbookCollection() {
+		return of(mockWorkbookData);
+	}
+}
 
 describe('WorkbookListComponent', () => {
 	let component: WorkbookListComponent;
@@ -12,7 +21,7 @@ describe('WorkbookListComponent', () => {
 			TestBed.configureTestingModule({
 				imports: [ FormsModule, ReactiveFormsModule ],
 				declarations: [ WorkbookListComponent ],
-				providers: [ FormBuilder ]
+				providers: [ FormBuilder, { provide: FirestoreService, useClass: MockFireStoreService } ]
 			}).compileComponents();
 		})
 	);
@@ -52,5 +61,11 @@ describe('WorkbookListComponent', () => {
 
 	it('should have a FormBuilder injected into it', () => {
 		expect(component.formBuilder).toBeTruthy();
+		expect(fixture.debugElement.injector.get(FormBuilder));
+	});
+
+	it('should have a Firestore service injected into it', () => {
+		expect(component.firestoreService).toBeTruthy();
+		expect(fixture.debugElement.injector.get(FirestoreService));
 	});
 });

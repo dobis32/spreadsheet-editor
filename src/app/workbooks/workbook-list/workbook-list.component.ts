@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { FirestoreService } from 'src/app/services/firestore.service';
 
 @Component({
 	selector: 'app-workbook-list',
@@ -9,7 +10,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 export class WorkbookListComponent implements OnInit {
 	public workbooks: Array<any>;
 	public workbookForm: FormGroup;
-	constructor(public formBuilder: FormBuilder) {
+	constructor(public formBuilder: FormBuilder, public firestoreService: FirestoreService) {
 		this.workbooks = [
 			{ name: 'mockBook1', id: 'id1' },
 			{ name: 'mockBook2', id: 'id2' },
