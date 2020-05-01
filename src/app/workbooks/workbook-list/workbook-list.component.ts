@@ -8,22 +8,50 @@ import { FirestoreService } from 'src/app/services/firestore.service';
 	styleUrls: [ './workbook-list.component.scss' ]
 })
 export class WorkbookListComponent implements OnInit {
-	public workbooks: Array<any>;
+	public workbooks: Array<any> = new Array<any>();
 	public workbookForm: FormGroup;
 	constructor(public formBuilder: FormBuilder, public firestoreService: FirestoreService) {
-		this.workbooks = [
-			{ name: 'mockBook1', id: 'id1' },
-			{ name: 'mockBook2', id: 'id2' },
-			{ name: 'mockBook3', id: 'id3' }
-		];
+		this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
+			this.workbooks = workbooksData;
+			console.log('workbook sub', this.workbooks);
+		});
 		this.workbookForm = this.formBuilder.group({ name: '' });
 	}
 
 	ngOnInit(): void {}
 
-	addWorkbook(fg: FormGroup) {
-		const workbook = { name: fg.value.name, id: 'id' + this.workbooks.length.toString() };
-		this.workbooks.push(workbook);
-		fg.reset();
+	async addWorkbook(fg: FormGroup) {
+		try {
+			if (!fg.value.name) throw new Error('Invalid workbook name');
+			const workbook = { name: fg.value.name };
+			let result = await this.firestoreService.addWorkbook(workbook);
+			if (result) console.log('result of book add is truthy');
+			fg.reset();
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	async removeWorkbook(id: string) {
+		try {
+			if (!id) throw new Error('Invalid ID');
+			await this.firestoreService.removeWorkbook(id);
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	signIn() {
+		// temporary
+		let result = this.firestoreService.signIn('scott.qwet@gmail.com', 'vander123');
+		if (result) console.log('sign in successful');
+		else console.log('sign in failed');
+	}
+
+	signOut() {
+		// temporary
+		let result = this.firestoreService.signOut();
+		if (result) console.log('sign out successful');
+		else console.log('sign out failed');
 	}
 }

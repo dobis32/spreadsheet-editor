@@ -2,7 +2,7 @@
 <hr>
 <h3>Workbooks</h3>
 <ul>
-    <li *ngFor="let workbook of workbooks">{{ workbook.name }}</li>
+    <li *ngFor="let workbook of workbooks">{{ workbook.name }} <button (click)="removeWorkbook(workbook.id)">Remove</button></li>
 </ul>
 <hr>
 <h3>Add Workbook</h3>
@@ -12,3 +12,5 @@
     <input type="text" formControlName="name">
     <button>Add</button>
 </form>
+<button (click)="signOut()">sign out</button> <!-- temporary -->
+<button (click)="signIn()">sign in</button> <!-- temporary -->
