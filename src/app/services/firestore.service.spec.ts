@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { FirestoreService } from './firestore.service';
 import { of } from 'rxjs';
@@ -38,6 +38,12 @@ class MockAngularFirestoreService {
 }
 
 class MockFireAuthService {
+	public currentUser: Promise<any>;
+	constructor() {
+		this.currentUser = new Promise((resolve, reject) => {
+			resolve({ uid: 'uid' });
+		});
+	}
 	signInWithEmailAndPassword() {
 		return new Promise((resolve, reject) => {
 			resolve(true);
@@ -150,6 +156,7 @@ describe('FirestoreService', () => {
 	it('should have a signOut function that returns true when the signOut AngularFireAuth function returns a resolving promise', async () => {
 		let afa = TestBed.get(AngularFireAuth);
 		let afaSpy = spyOn(afa, 'signOut').and.callFake(() => {});
+		expect();
 		expect(afaSpy).toHaveBeenCalledTimes(0);
 		expect(await service.signOut()).toBeTrue();
 		expect(afaSpy).toHaveBeenCalledTimes(1);
@@ -169,6 +176,7 @@ describe('FirestoreService', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'add').and.callThrough();
 		let truthyWorkbookData = mockWorkbookData[0];
+		service.uid = 'someID';
 		expect(truthyWorkbookData).toBeTruthy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 		await service.addWorkbook(truthyWorkbookData);

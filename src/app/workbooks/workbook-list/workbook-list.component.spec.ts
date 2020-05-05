@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { WorkbookListComponent } from './workbook-list.component';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { mockWorkbookData } from '../../../assets/mockData';
 
 class MockFirestoreService {
@@ -17,6 +17,8 @@ class MockFirestoreService {
 	removeWorkbook(id: string) {
 		return Promise.resolve(true);
 	}
+
+	public loggedIn: Observable<any> = of(true);
 }
 
 describe('WorkbookListComponent', () => {

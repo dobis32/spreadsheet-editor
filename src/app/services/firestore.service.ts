@@ -1,24 +1,39 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { Observable } from 'rxjs';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class FirestoreService {
+	public loggedIn: Observable<any>;
+	public uid: string;
 	constructor(public firestore: AngularFirestore, public afAuth: AngularFireAuth) {
-		this.afAuth.onAuthStateChanged((f) => {
-			console.log('auth state change');
+		this.loggedIn = new Observable((subscriber) => {
+			this.afAuth.onAuthStateChanged((user) => {
+				console.log(user.uid);
+				this.uid = user.uid;
+				if (user) subscriber.next(user.uid);
+				else {
+					this.uid = undefined;
+					subscriber.next(false);
+					subscriber.complete();
+				}
+			});
 		});
 	}
 
 	getWorkbookCollection() {
-		return this.firestore.collection('workbooks').valueChanges({ idField: 'id' });
+		return this.firestore.collection(`workbooks`).valueChanges({ idField: 'id' });
 	}
 
-	async addWorkbook(workbook: any) {
+	async addWorkbook(data: any) {
+		let workbook = { ...data };
 		try {
 			if (!workbook) throw new Error('Invalid workbook data provided');
+			if (!this.uid) throw new Error('No user logged in.');
+			workbook.uid = this.uid;
 			return await this.firestore.collection('workbooks').add(workbook);
 		} catch (error) {
 			console.log(error);

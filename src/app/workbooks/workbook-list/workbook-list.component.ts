@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
-
+import { Subscription } from 'rxjs';
 @Component({
 	selector: 'app-workbook-list',
 	templateUrl: './workbook-list.component.html',
@@ -10,11 +10,20 @@ import { FirestoreService } from 'src/app/services/firestore.service';
 export class WorkbookListComponent implements OnInit {
 	public workbooks: Array<any> = new Array<any>();
 	public workbookForm: FormGroup;
+	public signedInAuth: Subscription;
 	constructor(public formBuilder: FormBuilder, public firestoreService: FirestoreService) {
-		this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
-			this.workbooks = workbooksData;
-			console.log('workbook sub', this.workbooks);
+		this.firestoreService.loggedIn.subscribe((user) => {
+			if (user) {
+				console.log('USER IS LOGGED IN');
+				this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
+					this.workbooks = workbooksData;
+					console.log('workbook sub', this.workbooks);
+				});
+			} else {
+				console.log('USER IS NOT LOGGED IN');
+			}
 		});
+
 		this.workbookForm = this.formBuilder.group({ name: '' });
 	}
 
