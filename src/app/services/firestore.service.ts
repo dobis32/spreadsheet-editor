@@ -53,6 +53,17 @@ export class FirestoreService {
 		}
 	}
 
+	async updateWorkbook(id: string, data: any) {
+		try {
+			if (!id || !data) throw new Error('Invalid ID or data');
+			await this.firestore.collection('workbooks').doc(id).update(data);
+			return true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	}
+
 	getWorkbookDocument(id: string) {
 		try {
 			if (!id) throw new Error('Invalid workbook ID');

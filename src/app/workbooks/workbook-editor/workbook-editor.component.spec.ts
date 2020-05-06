@@ -8,6 +8,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { routes } from '../../app-routing.module';
 import { ActivatedRoute } from '@angular/router';
 import { By } from '@angular/platform-browser';
+import { FormBuilder, FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
 
 class MockFirestoreService {
 	public signedIn: Observable<any>;
@@ -18,6 +19,16 @@ class MockFirestoreService {
 	public getWorkbookDocument(id: string) {
 		if (id) return of(mockWorkbookDocument);
 		else return of(false);
+	}
+
+	public updateWorkbook(id: string, data: any) {
+		try {
+			if (!id || !data) throw new Error('Invalid ID or data');
+			return true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
 	}
 }
 
@@ -35,9 +46,10 @@ describe('WorkbookEditorComponent', () => {
 	beforeEach(
 		async(() => {
 			TestBed.configureTestingModule({
-				imports: [ RouterTestingModule.withRoutes(routes) ],
+				imports: [ FormsModule, ReactiveFormsModule, RouterTestingModule.withRoutes(routes) ],
 				declarations: [ WorkbookEditorComponent ],
 				providers: [
+					FormBuilder,
 					{ provide: ActivatedRoute, useClass: MockActivatedRoute },
 					{ provide: FirestoreService, useClass: MockFirestoreService }
 				]
@@ -94,8 +106,36 @@ describe('WorkbookEditorComponent', () => {
 		expect(component.currentWorkbook.defaults.rows.length).toEqual(rowElements.length);
 	});
 
+	it('should have an updateWorkbookName function', () => {
+		expect(component.updateWorkbookName).toBeTruthy();
+		expect(typeof component.updateWorkbookName).toEqual('function');
+	});
+
+	it('should have an updateWorkbookName function that calls the appropriate firestore service function when the associated formgroup has a truthy name value', async () => {
+		component.nameForm.value.name = 'some_value';
+		let firestoreSpy = spyOn(
+			fixture.debugElement.injector.get(FirestoreService),
+			'updateWorkbook'
+		).and.callThrough();
+		component.updateWorkbookName(component.nameForm);
+		expect(firestoreSpy).toHaveBeenCalledTimes(1);
+		component.nameForm.value.name = ''; // falsy value
+		component.updateWorkbookName(component.nameForm);
+		expect(firestoreSpy).toHaveBeenCalledTimes(1); // expect to not have been called another time
+	});
+
 	it('should have an editRow function', () => {
 		expect(component.editRow).toBeTruthy();
 		expect(typeof component.editRow).toEqual('function');
+	});
+
+	it('should have an addHeaderField function', () => {
+		expect(component.addHeaderField).toBeTruthy();
+		expect(typeof component.addHeaderField).toEqual('function');
+	});
+
+	it('should have a deleteHeaderField function', () => {
+		expect(component.deleteHeaderField).toBeTruthy();
+		expect(typeof component.deleteHeaderField).toEqual('function');
 	});
 });

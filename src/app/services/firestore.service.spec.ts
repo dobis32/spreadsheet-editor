@@ -1,7 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { FirestoreService } from './firestore.service';
-import { of, Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { mockWorkbookData } from '../../assets/mockData';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
@@ -22,7 +22,8 @@ class MockAngularFirestoreService {
 			doc: (id) => {
 				return {
 					delete: this.delete,
-					valueChanges: this.valueChanges
+					valueChanges: this.valueChanges,
+					update: this.update
 				};
 			},
 			add: this.add
@@ -38,6 +39,9 @@ class MockAngularFirestoreService {
 	}
 	valueChanges() {
 		return of({ id: 'id', uid: 'uid', name: 'name' });
+	}
+	update() {
+		return Promise.resolve();
 	}
 }
 
@@ -234,5 +238,18 @@ describe('FirestoreService', () => {
 		expect(typeof service.getWorkbookDocument).toEqual('function');
 		await service.getWorkbookDocument('');
 		expect(afsSpy).toHaveBeenCalledTimes(0);
+	});
+
+	it('should have an updateWorkbook function', () => {
+		expect(service.updateWorkbook).toBeTruthy();
+		expect(typeof service.updateWorkbook).toEqual('function');
+	});
+
+	it('should have a updateWorkbook function that calls the appropriate AngularFirestore function when truthy ID and data args are passed in', () => {
+		let afs = TestBed.get(AngularFirestore);
+		let afsSpy = spyOn(afs, 'update').and.callThrough();
+		expect(afsSpy).toHaveBeenCalledTimes(0);
+		service.updateWorkbook('some_ID', mockWorkbookData);
+		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 });
