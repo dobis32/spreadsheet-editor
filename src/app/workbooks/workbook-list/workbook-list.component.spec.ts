@@ -4,8 +4,16 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { of, Observable } from 'rxjs';
 import { mockWorkbookData } from '../../../assets/mockData';
+import { RouterTestingModule } from '@angular/router/testing';
+import { routes } from '../../app-routing.module';
+import { ActivatedRoute, Router } from '@angular/router';
 
 class MockFirestoreService {
+	public signedIn: Observable<any>;
+
+	constructor() {
+		this.signedIn = of('userID');
+	}
 	getWorkbookCollection() {
 		return of(mockWorkbookData);
 	}
@@ -17,8 +25,6 @@ class MockFirestoreService {
 	removeWorkbook(id: string) {
 		return Promise.resolve(true);
 	}
-
-	public loggedIn: Observable<any> = of(true);
 }
 
 describe('WorkbookListComponent', () => {
@@ -28,7 +34,7 @@ describe('WorkbookListComponent', () => {
 	beforeEach(
 		async(() => {
 			TestBed.configureTestingModule({
-				imports: [ FormsModule, ReactiveFormsModule ],
+				imports: [ FormsModule, ReactiveFormsModule, RouterTestingModule.withRoutes(routes) ],
 				declarations: [ WorkbookListComponent ],
 				providers: [ FormBuilder, { provide: FirestoreService, useClass: MockFirestoreService } ]
 			}).compileComponents();
@@ -103,5 +109,41 @@ describe('WorkbookListComponent', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 		await component.removeWorkbook(falsyID);
 		expect(afsSpy).toHaveBeenCalledTimes(0);
+	});
+
+	it('should call getWorkbookCollection function of the firestore service', async () => {
+		let mockData: Array<any> = mockWorkbookData;
+		let fireStoreSpy = spyOn(
+			fixture.debugElement.injector.get(FirestoreService),
+			'getWorkbookCollection'
+		).and.callThrough();
+		fixture = TestBed.createComponent(WorkbookListComponent);
+		expect(fireStoreSpy).toHaveBeenCalledTimes(1);
+		expect(component.workbooks).toEqual(mockData);
+	});
+
+	it('should have an activate route injected into it', () => {
+		expect(fixture.debugElement.injector.get(ActivatedRoute)).toBeTruthy();
+	});
+
+	it('should have a router injected into it', () => {
+		expect(fixture.debugElement.injector.get(Router)).toBeTruthy();
+	});
+
+	it('should have an editWorkbook function', () => {
+		expect(component.editWorkbook).toBeTruthy();
+		expect(typeof component.editWorkbook).toEqual('function');
+	});
+
+	it('should use the injected router to navigate to the workbook edit page when the editWorkbook function is called with truthy string arg', () => {
+		let router = fixture.debugElement.injector.get(Router);
+		let routerSpy = spyOn(router, 'navigate').and.callFake(() => {
+			return Promise.resolve(true);
+		});
+		expect(routerSpy).toHaveBeenCalledTimes(0);
+		component.editWorkbook('some_workbook_ID');
+		expect(routerSpy).toHaveBeenCalledTimes(1);
+		component.editWorkbook('');
+		expect(routerSpy).toHaveBeenCalledTimes(1);
 	});
 });

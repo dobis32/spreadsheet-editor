@@ -1,7 +1,37 @@
 export let mockWorkbookData = [
-	{ name: 'book1', id: 'id1' },
-	{ name: 'book2', id: 'id2' },
-	{ name: 'book3', id: 'id3' },
-	{ name: 'book4', id: 'id4' },
-	{ name: 'book5', id: 'id5' }
+	{ name: 'book1', id: 'id1', uid: 'uid1' },
+	{ name: 'book2', id: 'id2', uid: 'uid2' },
+	{ name: 'book3', id: 'id3', uid: 'uid3' },
+	{ name: 'book4', id: 'id4', uid: 'uid4' },
+	{ name: 'book5', id: 'id5', uid: 'uid5' }
 ];
+
+export let mockWorkbookDocument = {
+	id: 'id',
+	uid: 'uid',
+	name: 'name',
+	defaults: {
+		headerFields: [
+			{
+				name: 'field1',
+				text: true,
+				value: 'some_value'
+			},
+			{
+				name: 'field2',
+				text: false,
+				value: 300.001
+			}
+		],
+		rows: [
+			{
+				field1: 'some_value',
+				field2: 3000.001
+			},
+			{
+				field1: 'some_other_value',
+				field2: 123
+			}
+		]
+	}
+};

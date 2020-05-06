@@ -7,9 +7,10 @@ import { WorkbookListComponent } from './workbooks/workbook-list/workbook-list.c
 import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { WorkbookEditorComponent } from './workbooks/workbook-editor/workbook-editor.component';
 
 @NgModule({
-	declarations: [ AppComponent, WorkbookListComponent ],
+	declarations: [ AppComponent, WorkbookListComponent, WorkbookEditorComponent ],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,

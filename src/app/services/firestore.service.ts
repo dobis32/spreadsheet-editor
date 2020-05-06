@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class FirestoreService {
-	public loggedIn: Observable<any>;
+	public signedIn: Observable<any>;
 	public uid: string;
 	constructor(public firestore: AngularFirestore, public afAuth: AngularFireAuth) {
-		this.loggedIn = new Observable((subscriber) => {
+		this.signedIn = new Observable((subscriber) => {
 			this.afAuth.onAuthStateChanged((user) => {
 				console.log(user.uid);
 				this.uid = user.uid;
@@ -34,7 +34,8 @@ export class FirestoreService {
 			if (!workbook) throw new Error('Invalid workbook data provided');
 			if (!this.uid) throw new Error('No user logged in.');
 			workbook.uid = this.uid;
-			return await this.firestore.collection('workbooks').add(workbook);
+			await this.firestore.collection('workbooks').add(workbook);
+			return true;
 		} catch (error) {
 			console.log(error);
 			return false;
@@ -43,12 +44,22 @@ export class FirestoreService {
 
 	async removeWorkbook(id: string) {
 		try {
-			if (!id) throw new Error('Invalid ID provided');
+			if (!id) throw new Error('Invalid workbook ID');
 			await this.firestore.collection('workbooks').doc(id).delete();
 			return true;
 		} catch (error) {
 			console.log(error);
 			return false;
+		}
+	}
+
+	getWorkbookDocument(id: string) {
+		try {
+			if (!id) throw new Error('Invalid workbook ID');
+			return this.firestore.collection('workbooks').doc(id).valueChanges();
+		} catch (error) {
+			console.log(error);
+			return of(false);
 		}
 	}
 

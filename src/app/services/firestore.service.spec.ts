@@ -1,7 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { FirestoreService } from './firestore.service';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { mockWorkbookData } from '../../assets/mockData';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
@@ -21,7 +21,8 @@ class MockAngularFirestoreService {
 			},
 			doc: (id) => {
 				return {
-					delete: this.delete
+					delete: this.delete,
+					valueChanges: this.valueChanges
 				};
 			},
 			add: this.add
@@ -35,6 +36,9 @@ class MockAngularFirestoreService {
 	add() {
 		return Promise.resolve();
 	}
+	valueChanges() {
+		return of({ id: 'id', uid: 'uid', name: 'name' });
+	}
 }
 
 class MockFireAuthService {
@@ -44,6 +48,7 @@ class MockFireAuthService {
 			resolve({ uid: 'uid' });
 		});
 	}
+
 	signInWithEmailAndPassword() {
 		return new Promise((resolve, reject) => {
 			resolve(true);
@@ -210,6 +215,24 @@ describe('FirestoreService', () => {
 		expect(falsyID).toBeFalsy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 		await service.removeWorkbook(falsyID);
+		expect(afsSpy).toHaveBeenCalledTimes(0);
+	});
+
+	it('should have a getWorkbookDocument function that calls the appropriate AngularFirestore function when a truthy string arg is passed', async () => {
+		let afs = TestBed.get(AngularFirestore);
+		let afsSpy = spyOn(afs, 'valueChanges').and.callThrough();
+		expect(service.getWorkbookDocument).toBeTruthy();
+		expect(typeof service.getWorkbookDocument).toEqual('function');
+		await service.getWorkbookDocument('id');
+		expect(afsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a getWorkbookDocument function that does not call the appropriate AngularFirestore function when a falsy string arg is passed', async () => {
+		let afs = TestBed.get(AngularFirestore);
+		let afsSpy = spyOn(afs, 'valueChanges').and.callThrough();
+		expect(service.getWorkbookDocument).toBeTruthy();
+		expect(typeof service.getWorkbookDocument).toEqual('function');
+		await service.getWorkbookDocument('');
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 });

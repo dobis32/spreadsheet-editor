@@ -1,0 +1,27 @@
+<h1>Workbook Editor</h1>
+<hr>
+<h3>Default Header Fields:</h3>
+<ul>
+    <li *ngFor="let headerField of currentWorkbook.defaults.headerFields">
+        {{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}
+        
+    </li>
+</ul>
+<hr>
+<h3>Default Rows:</h3>
+<table>
+    <tr>
+        <th class="default-header-fields" *ngFor="let headerField of currentWorkbook.defaults.headerFields">
+            {{ headerField.name }}
+        </th>
+    </tr>
+    <tr class="default-rows" *ngFor="let row of currentWorkbook.defaults.rows">
+        <td *ngFor="let headerField of currentWorkbook.defaults.headerFields">
+           {{row[headerField.name]}}
+        </td>
+        <td>
+            <button (click)="editRow(row)">Edit</button>
+        </td>
+    </tr>
+</table>
+<hr>

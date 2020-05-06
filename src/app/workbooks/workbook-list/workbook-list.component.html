@@ -2,7 +2,11 @@
 <hr>
 <h3>Workbooks</h3>
 <ul>
-    <li *ngFor="let workbook of workbooks">{{ workbook.name }} <button (click)="removeWorkbook(workbook.id)">Remove</button></li>
+    <li *ngFor="let workbook of workbooks">
+        {{ workbook.name }} 
+        <button (click)="removeWorkbook(workbook.id)">Remove</button>
+        <button (click)="editWorkbook(workbook.id)">Edit</button>
+    </li>
 </ul>
 <hr>
 <h3>Add Workbook</h3>

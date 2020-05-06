@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+
 @Component({
 	selector: 'app-workbook-list',
 	templateUrl: './workbook-list.component.html',
@@ -11,19 +14,21 @@ export class WorkbookListComponent implements OnInit {
 	public workbooks: Array<any> = new Array<any>();
 	public workbookForm: FormGroup;
 	public signedInAuth: Subscription;
-	constructor(public formBuilder: FormBuilder, public firestoreService: FirestoreService) {
-		this.firestoreService.loggedIn.subscribe((user) => {
+	constructor(
+		public formBuilder: FormBuilder,
+		public firestoreService: FirestoreService,
+		public route: ActivatedRoute,
+		public router: Router
+	) {
+		this.signedInAuth = this.firestoreService.signedIn.subscribe((user) => {
 			if (user) {
-				console.log('USER IS LOGGED IN');
 				this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
 					this.workbooks = workbooksData;
-					console.log('workbook sub', this.workbooks);
 				});
 			} else {
-				console.log('USER IS NOT LOGGED IN');
+				throw new Error('User is no longer logged in!');
 			}
 		});
-
 		this.workbookForm = this.formBuilder.group({ name: '' });
 	}
 
@@ -44,10 +49,16 @@ export class WorkbookListComponent implements OnInit {
 	async removeWorkbook(id: string) {
 		try {
 			if (!id) throw new Error('Invalid ID');
-			await this.firestoreService.removeWorkbook(id);
+			const result = await this.firestoreService.removeWorkbook(id);
+			if (!result) throw new Error('Failed to remove workbook');
 		} catch (error) {
 			console.log(error);
 		}
+	}
+
+	editWorkbook(id: string) {
+		if (id) this.router.navigate([ '/workbooks/edit', id ]);
+		else console.log('[ROUTER ERROR] Invalid ID parameter');
 	}
 
 	signIn() {
