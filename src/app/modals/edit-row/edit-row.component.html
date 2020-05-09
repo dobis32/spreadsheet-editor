@@ -1,0 +1,26 @@
+<div class="modal-header">
+    <h4 class="modal-title">Edit Row</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form class="ml-3" [formGroup]="rowForm" (ngSubmit)="save(rowForm)">
+        <div *ngFor="let headerField of workbook.defaults.headerFields" class="row mb-3">
+            <label class="mt-1" for="{{headerField.name}}">{{headerField.name | titlecase}}</label>
+            <input class="ml-2" type="{{headerField.text ? 'text' : 'number'}}" name="{{headerField.name}}" formControlName="{{headerField.name}}">
+        </div>
+        <div class="row mb-3">
+            <button class="ml-3 mt-3">Save</button>
+        </div>
+        <div class="row">
+            <h4 *ngIf="updateFailure" class="error-message">Action failed. Try again.</h4>
+        </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+      <div class="row">
+          <button class="ml-3 mt-3" (click)="deleteRow(rowToEdit)">Delete</button>
+      </div>
+  </div>
+  

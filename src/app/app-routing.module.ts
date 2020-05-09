@@ -5,7 +5,7 @@ import { WorkbookEditorComponent } from './workbooks/workbook-editor/workbook-ed
 
 export const routes: Routes = [
 	{
-		path: 'workbook/list',
+		path: 'workbooks/list',
 		component: WorkbookListComponent
 	},
 	{

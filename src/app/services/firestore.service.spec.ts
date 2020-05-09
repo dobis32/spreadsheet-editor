@@ -121,7 +121,7 @@ describe('FirestoreService', () => {
 		expect(TestBed.get(AngularFireAuth)).toBeTruthy();
 	});
 
-	it('should have a signIn function that calls the signInWithEmailAndPassword AngularFireAuth function', async () => {
+	it('should have a sign-in function that calls the signInWithEmailAndPassword AngularFireAuth function', async () => {
 		let afa = TestBed.get(AngularFireAuth);
 		let afaSpy = spyOn(afa, 'signInWithEmailAndPassword').and.callFake(() => {});
 		expect(afaSpy).toHaveBeenCalledTimes(0);
@@ -129,7 +129,7 @@ describe('FirestoreService', () => {
 		expect(afaSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a signIn function that returns true when called with truthy strings args', async () => {
+	it('should have a sign-in function that returns true when called with truthy strings args', async () => {
 		let truthyEmail = 'some@email.com';
 		let truthyPassword = 'really_strong_password';
 		let afa = TestBed.get(AngularFireAuth);
@@ -139,7 +139,7 @@ describe('FirestoreService', () => {
 		expect(await service.signIn(truthyEmail, truthyPassword)).toBeTrue();
 	});
 
-	it('should have a signIn function that returns false when called with falsy strings args', async () => {
+	it('should have a sign-in function that returns false when called with falsy strings args', async () => {
 		let truthyEmail = 'some@email.com';
 		let truthyPassword = 'really_strong_password';
 		let falsyEmail = '';
@@ -154,7 +154,7 @@ describe('FirestoreService', () => {
 		expect(await service.signIn(falsyEmail, falsyPassword)).toBeFalse();
 	});
 
-	it('should have a signOut function that calls the signOut AngularFireAuth function', async () => {
+	it('should have a sign-out function that calls the sign-out AngularFireAuth function', async () => {
 		let afa = TestBed.get(AngularFireAuth);
 		let afaSpy = spyOn(afa, 'signOut').and.callFake(() => {});
 		expect(afaSpy).toHaveBeenCalledTimes(0);
@@ -162,7 +162,7 @@ describe('FirestoreService', () => {
 		expect(afaSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a signOut function that returns true when the signOut AngularFireAuth function returns a resolving promise', async () => {
+	it('should have a  sign-out function that returns true when the promise, returned from the sign-out AngularFireAuth function, resolves', async () => {
 		let afa = TestBed.get(AngularFireAuth);
 		let afaSpy = spyOn(afa, 'signOut').and.callFake(() => {});
 		expect();
@@ -171,7 +171,7 @@ describe('FirestoreService', () => {
 		expect(afaSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a signOut function that returns true when the signOut AngularFireAuth function returns a rejecting promise', async () => {
+	it('should have a sign-out function that returns true when the sign-out AngularFireAuth function returns a rejecting promise', async () => {
 		let afa = TestBed.get(AngularFireAuth);
 		let afaSpy = spyOn(afa, 'signOut').and.callFake(() => {
 			return Promise.reject();
@@ -181,7 +181,7 @@ describe('FirestoreService', () => {
 		expect(afaSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have an addWorkbook function that calls the appropriate AngularFirestore function when a truthy arg is passed', async () => {
+	it('should have a function for adding a new workbook that calls the appropriate AngularFirestore function when a truthy arg is passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'add').and.callThrough();
 		let truthyWorkbookData = mockWorkbookData[0];
@@ -192,7 +192,7 @@ describe('FirestoreService', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have an addWorkbook function that calls the appropriate AngularFirestore function when a falsy arg is passed', async () => {
+	it('should have a function for adding a new workbook that does not call the appropriate AngularFirestore function when a falsy arg is passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'add').and.callThrough();
 		let falsyWorkbookData = undefined;
@@ -202,7 +202,7 @@ describe('FirestoreService', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
-	it('should have a removeWorkbook function that calls the appropriate AngularFirestore function when a truthy string arg is passed', async () => {
+	it('should have a function for removing a workbook that calls the appropriate AngularFirestore function when a truthy string arg is passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'delete').and.callThrough();
 		let truthyID = 'someID';
@@ -212,7 +212,7 @@ describe('FirestoreService', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a removeWorkbook function that does not call the appropriate AngularFirestore function when a falsy string arg is passed', async () => {
+	it('should have a function for removing a workbook that does not call the appropriate AngularFirestore function when a falsy string arg is passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'delete').and.callThrough();
 		let falsyID = '';
@@ -222,7 +222,7 @@ describe('FirestoreService', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
-	it('should have a getWorkbookDocument function that calls the appropriate AngularFirestore function when a truthy string arg is passed', async () => {
+	it('should have a function for retrieving a workbook document that calls the appropriate AngularFirestore function when a truthy string arg is passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'valueChanges').and.callThrough();
 		expect(service.getWorkbookDocument).toBeTruthy();
@@ -231,7 +231,7 @@ describe('FirestoreService', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a getWorkbookDocument function that does not call the appropriate AngularFirestore function when a falsy string arg is passed', async () => {
+	it('should have a function for retrieving a workbook document that does not call the appropriate AngularFirestore function when a falsy string arg is passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'valueChanges').and.callThrough();
 		expect(service.getWorkbookDocument).toBeTruthy();
@@ -245,11 +245,33 @@ describe('FirestoreService', () => {
 		expect(typeof service.updateWorkbook).toEqual('function');
 	});
 
-	it('should have a updateWorkbook function that calls the appropriate AngularFirestore function when truthy ID and data args are passed in', () => {
+	it('should have a function for updating a workbook that calls the appropriate AngularFirestore function when truthy ID and data args are passed in', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'update').and.callThrough();
+
 		expect(afsSpy).toHaveBeenCalledTimes(0);
+
 		service.updateWorkbook('some_ID', mockWorkbookData);
+
 		expect(afsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a function for updating a workbook that calls the appropriate AngularFirestore function when truthy ID and data args are passed in', () => {
+		let falsyID = '';
+		let falsyData = undefined;
+
+		expect(falsyID).toBeFalsy();
+		expect(falsyData).toBeFalsy();
+
+		let afs = TestBed.get(AngularFirestore);
+		let afsSpy = spyOn(afs, 'update').and.callThrough();
+
+		expect(afsSpy).toHaveBeenCalledTimes(0);
+
+		service.updateWorkbook(falsyID, mockWorkbookData);
+		service.updateWorkbook('some_id', falsyData);
+		service.updateWorkbook(falsyID, falsyData);
+
+		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 });

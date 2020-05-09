@@ -3,6 +3,9 @@ import { FirestoreService } from 'src/app/services/firestore.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditHeaderFieldComponent } from '../../modals/edit-header-field/edit-header-field.component';
+import { EditRowComponent } from '../../modals/edit-row/edit-row.component';
 
 @Component({
 	selector: 'app-workbook-editor',
@@ -19,7 +22,8 @@ export class WorkbookEditorComponent implements OnInit {
 	constructor(
 		public formBuilder: FormBuilder,
 		public firestoreService: FirestoreService,
-		public route: ActivatedRoute
+		public route: ActivatedRoute,
+		public modalService: NgbModal
 	) {
 		this.nameForm = this.formBuilder.group({ name: '' });
 		this.signInAuth = this.firestoreService.signedIn.subscribe(async (user) => {
@@ -40,16 +44,32 @@ export class WorkbookEditorComponent implements OnInit {
 
 	ngOnInit(): void {}
 
-	addHeaderField() {
-		// implement me
+	addRow() {}
+
+	openEditFieldModal(headerField?: any) {
+		let headerFieldToEdit = headerField ? headerField : { name: '', text: true, value: '' };
+		const modalRef = this.modalService.open(EditHeaderFieldComponent);
+		modalRef.componentInstance.fieldToEdit = headerFieldToEdit;
+		modalRef.componentInstance.workbookId = this.workbookId;
+		modalRef.componentInstance.workbook = this.currentWorkbook;
+		modalRef.componentInstance.fs = this.firestoreService;
 	}
 
-	deleteHeaderField() {}
+	openEditRowModal(row?: any) {
+		let rowToEdit = row ? row : this.getDefaultRow();
+		const modalRef = this.modalService.open(EditRowComponent);
+		modalRef.componentInstance.rowToEdit = rowToEdit;
+		modalRef.componentInstance.workbookId = this.workbookId;
+		modalRef.componentInstance.workbook = this.currentWorkbook;
+		modalRef.componentInstance.fs = this.firestoreService;
+	}
 
-	editRow(row: any) {
-		console.log('edit row:', row);
-		row.field1 = 'foobar';
-		console.log(row, this.currentWorkbook);
+	getDefaultRow() {
+		let row = {};
+		this.currentWorkbook.defaults.headerFields.forEach((headerField) => {
+			row[headerField.name] = headerField.text ? headerField.value : parseFloat(headerField.value);
+		});
+		return row;
 	}
 
 	updateWorkbookName(fg: FormGroup) {

@@ -6,14 +6,16 @@
     <button>Save</button>
 </form>
 <h3>Default Header Fields:</h3>
+<button (click)="openEditFieldModal()">Add</button>
 <ul *ngIf="currentWorkbook && currentWorkbook.defaults">
     <li *ngFor="let headerField of currentWorkbook.defaults.headerFields">
         {{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}
-        
+        <button (click)="openEditFieldModal(headerField)">Edit</button>
     </li>
 </ul>
 <hr>
-<h3>Default Rows:</h3>
+<h3>Default Rows:</h3>        
+<button (click)="openEditRowModal()">Add</button>
 <table *ngIf="currentWorkbook && currentWorkbook.defaults">
     <tr>
         <th class="default-header-fields" *ngFor="let headerField of currentWorkbook.defaults.headerFields">
@@ -25,7 +27,7 @@
            {{row[headerField.name]}}
         </td>
         <td>
-            <button (click)="editRow(row)">Edit</button>
+            <button (click)="openEditRowModal(row)">Edit</button>
         </td>
     </tr>
 </table>

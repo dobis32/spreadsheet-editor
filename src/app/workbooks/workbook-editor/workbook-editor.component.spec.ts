@@ -3,13 +3,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { WorkbookEditorComponent } from './workbook-editor.component';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { Observable, of } from 'rxjs';
-import { mockWorkbookDocument } from 'src/assets/mockData';
+import { MockWorkBookFactory } from 'src/assets/mockData';
 import { RouterTestingModule } from '@angular/router/testing';
 import { routes } from '../../app-routing.module';
 import { ActivatedRoute } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { FormBuilder, FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
-
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EditHeaderFieldComponent } from '../../modals/edit-header-field/edit-header-field.component';
+let mockWorkBookFactory: MockWorkBookFactory = new MockWorkBookFactory();
 class MockFirestoreService {
 	public signedIn: Observable<any>;
 	constructor() {
@@ -17,7 +19,8 @@ class MockFirestoreService {
 	}
 
 	public getWorkbookDocument(id: string) {
-		if (id) return of(mockWorkbookDocument);
+		let data = mockWorkBookFactory.getWorkBookDocument();
+		if (id) return of(data);
 		else return of(false);
 	}
 
@@ -39,6 +42,13 @@ class MockActivatedRoute {
 	}
 }
 
+class MockNgbModal {
+	constructor() {}
+	open(data: any) {
+		return <NgbModalRef>{ componentInstance: {} };
+	}
+}
+
 describe('WorkbookEditorComponent', () => {
 	let component: WorkbookEditorComponent;
 	let fixture: ComponentFixture<WorkbookEditorComponent>;
@@ -50,6 +60,7 @@ describe('WorkbookEditorComponent', () => {
 				declarations: [ WorkbookEditorComponent ],
 				providers: [
 					FormBuilder,
+					{ provide: NgbModal, useClass: MockNgbModal },
 					{ provide: ActivatedRoute, useClass: MockActivatedRoute },
 					{ provide: FirestoreService, useClass: MockFirestoreService }
 				]
@@ -111,7 +122,7 @@ describe('WorkbookEditorComponent', () => {
 		expect(typeof component.updateWorkbookName).toEqual('function');
 	});
 
-	it('should have an updateWorkbookName function that calls the appropriate firestore service function when the associated formgroup has a truthy name value', async () => {
+	it('should have an function for updating the name of the current workbook that calls the appropriate firestore service function when the associated formgroup has a truthy name value', async () => {
 		component.nameForm.value.name = 'some_value';
 		let firestoreSpy = spyOn(
 			fixture.debugElement.injector.get(FirestoreService),
@@ -124,18 +135,27 @@ describe('WorkbookEditorComponent', () => {
 		expect(firestoreSpy).toHaveBeenCalledTimes(1); // expect to not have been called another time
 	});
 
-	it('should have an editRow function', () => {
-		expect(component.editRow).toBeTruthy();
-		expect(typeof component.editRow).toEqual('function');
+	// it('should have a function for editing rows', () => {
+	// 	expect(component.editRow).toBeTruthy();
+	// 	expect(typeof component.editRow).toEqual('function');
+	// });
+
+	it('should have a function that should open the NgbModal with EditHeaderFieldComponent', () => {
+		expect(component.openEditFieldModal).toBeTruthy();
+		expect(typeof component.openEditFieldModal).toEqual('function');
+		let modalSpy = spyOn(fixture.debugElement.injector.get(NgbModal), 'open').and.callThrough();
+		let data = component.currentWorkbook.defaults.headerFields[0];
+		component.openEditFieldModal(data);
+		expect(modalSpy).toHaveBeenCalledTimes(1);
+		expect(modalSpy).toHaveBeenCalledWith(EditHeaderFieldComponent);
 	});
 
-	it('should have an addHeaderField function', () => {
-		expect(component.addHeaderField).toBeTruthy();
-		expect(typeof component.addHeaderField).toEqual('function');
-	});
-
-	it('should have a deleteHeaderField function', () => {
-		expect(component.deleteHeaderField).toBeTruthy();
-		expect(typeof component.deleteHeaderField).toEqual('function');
+	it('should have a function for adding new header fields that opens the NgbModal with EditHeaderFieldComponent', () => {
+		expect(component.openEditFieldModal).toBeTruthy();
+		expect(typeof component.openEditFieldModal).toEqual('function');
+		let modalSpy = spyOn(fixture.debugElement.injector.get(NgbModal), 'open').and.callThrough();
+		component.openEditFieldModal();
+		expect(modalSpy).toHaveBeenCalledTimes(1);
+		expect(modalSpy).toHaveBeenCalledWith(EditHeaderFieldComponent);
 	});
 });

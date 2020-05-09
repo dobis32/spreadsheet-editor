@@ -8,18 +8,24 @@ import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { WorkbookEditorComponent } from './workbooks/workbook-editor/workbook-editor.component';
+import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { EditHeaderFieldComponent } from './modals/edit-header-field/edit-header-field.component';
+import { EditRowComponent } from './modals/edit-row/edit-row.component';
 
 @NgModule({
-	declarations: [ AppComponent, WorkbookListComponent, WorkbookEditorComponent ],
+	declarations: [ AppComponent, WorkbookListComponent, WorkbookEditorComponent, EditHeaderFieldComponent, EditRowComponent ],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		FormsModule,
 		ReactiveFormsModule,
-		AngularFireModule.initializeApp(environment.firebase)
+		AngularFireModule.initializeApp(environment.firebase),
+		NgbModule
+		// NgbModule
 		// AngularFirestoreModule.enablePersistence()
 	],
 	providers: [],
-	bootstrap: [ AppComponent ]
+	bootstrap: [ AppComponent ],
+	entryComponents: [ EditHeaderFieldComponent ]
 })
 export class AppModule {}
