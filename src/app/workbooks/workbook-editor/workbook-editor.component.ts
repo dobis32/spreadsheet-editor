@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditHeaderFieldComponent } from '../../modals/edit-header-field/edit-header-field.component';
 import { EditRowComponent } from '../../modals/edit-row/edit-row.component';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-workbook-editor',
@@ -23,6 +24,7 @@ export class WorkbookEditorComponent implements OnInit {
 		public formBuilder: FormBuilder,
 		public firestoreService: FirestoreService,
 		public route: ActivatedRoute,
+		public router: Router,
 		public modalService: NgbModal
 	) {
 		this.nameForm = this.formBuilder.group({ name: '' });
@@ -37,7 +39,7 @@ export class WorkbookEditorComponent implements OnInit {
 					this.nameForm.setValue({ name: this.currentWorkbook.name });
 				});
 			} else {
-				throw new Error('User is not logged in!');
+				this.router.navigate([ '/login' ]);
 			}
 		});
 	}

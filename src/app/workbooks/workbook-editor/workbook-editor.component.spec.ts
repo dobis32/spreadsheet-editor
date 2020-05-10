@@ -135,11 +135,6 @@ describe('WorkbookEditorComponent', () => {
 		expect(firestoreSpy).toHaveBeenCalledTimes(1); // expect to not have been called another time
 	});
 
-	// it('should have a function for editing rows', () => {
-	// 	expect(component.editRow).toBeTruthy();
-	// 	expect(typeof component.editRow).toEqual('function');
-	// });
-
 	it('should have a function that should open the NgbModal with EditHeaderFieldComponent', () => {
 		expect(component.openEditFieldModal).toBeTruthy();
 		expect(typeof component.openEditFieldModal).toEqual('function');

@@ -1,1 +1,9 @@
-<p>login works!</p>
+<h1>Sign In</h1>
+<form [formGroup]="signInForm" (ngSubmit)="signIn(signInForm)">
+    <label for="email">Email:</label>
+    <input type="email" name="email" formControlName="email" required>
+    <label for="password">Password:</label>
+    <input type="text" name="password" formControlName="password" required>
+    <button>Login</button>
+</form>
+<h3 *ngIf="invalidCredentials" class="error-message">Invalid email or password. Try again.</h3>

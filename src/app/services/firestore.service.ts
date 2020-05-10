@@ -11,16 +11,7 @@ export class FirestoreService {
 	public uid: string;
 	constructor(public firestore: AngularFirestore, public afAuth: AngularFireAuth) {
 		this.signedIn = new Observable((subscriber) => {
-			this.afAuth.onAuthStateChanged((user) => {
-				console.log(user.uid);
-				this.uid = user.uid;
-				if (user) subscriber.next(user.uid);
-				else {
-					this.uid = undefined;
-					subscriber.next(false);
-					subscriber.complete();
-				}
-			});
+			this.afAuth.onAuthStateChanged(subscriber);
 		});
 	}
 
@@ -90,7 +81,6 @@ export class FirestoreService {
 	async signOut() {
 		// temporary
 		try {
-			console.log('signing out');
 			await this.afAuth.signOut();
 			return true;
 		} catch (error) {

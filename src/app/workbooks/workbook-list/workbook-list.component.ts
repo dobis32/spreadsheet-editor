@@ -21,12 +21,13 @@ export class WorkbookListComponent implements OnInit {
 		public router: Router
 	) {
 		this.signedInAuth = this.firestoreService.signedIn.subscribe((user) => {
+			console.log('sign in auth sub', user);
 			if (user) {
 				this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
 					this.workbooks = workbooksData;
 				});
 			} else {
-				throw new Error('User is no longer logged in!');
+				this.router.navigate([ '/login' ]);
 			}
 		});
 		this.workbookForm = this.formBuilder.group({ name: '' });
@@ -61,12 +62,12 @@ export class WorkbookListComponent implements OnInit {
 		else console.log('[ROUTER ERROR] Invalid ID parameter');
 	}
 
-	signIn() {
-		// temporary
-		let result = this.firestoreService.signIn('scott.qwet@gmail.com', 'vander123');
-		if (result) console.log('sign in successful');
-		else console.log('sign in failed');
-	}
+	// signIn() {
+	// 	// temporary
+	// 	let result = this.firestoreService.signIn('scott.qwet@gmail.com', 'vander123');
+	// 	if (result) console.log('sign in successful');
+	// 	else console.log('sign in failed');
+	// }
 
 	signOut() {
 		// temporary
