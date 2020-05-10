@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { WorkbookListComponent } from './workbooks/workbook-list/workbook-list.component';
 import { WorkbookEditorComponent } from './workbooks/workbook-editor/workbook-editor.component';
 import { LoginComponent } from './login/login.component';
+import { SheetListComponent } from './sheets/sheet-list/sheet-list.component';
 
 export const routes: Routes = [
 	{
@@ -14,12 +15,16 @@ export const routes: Routes = [
 		component: WorkbookListComponent
 	},
 	{
-		path: 'workbooks/edit/:id',
+		path: 'workbooks/:id/edit',
 		component: WorkbookEditorComponent
 	},
 	{
-		path: 'login',
-		component: LoginComponent
+		path: 'workbooks/:workbookId/list',
+		component: SheetListComponent
+	},
+	{
+		path: 'workbooks/edit/:id',
+		component: WorkbookEditorComponent
 	},
 	{ path: '**', component: LoginComponent }
 ];

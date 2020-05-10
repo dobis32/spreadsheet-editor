@@ -12,9 +12,10 @@ import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditHeaderFieldComponent } from './modals/edit-header-field/edit-header-field.component';
 import { EditRowComponent } from './modals/edit-row/edit-row.component';
 import { LoginComponent } from './login/login.component';
+import { SheetListComponent } from './sheets/sheet-list/sheet-list.component';
 
 @NgModule({
-	declarations: [ AppComponent, WorkbookListComponent, WorkbookEditorComponent, EditHeaderFieldComponent, EditRowComponent, LoginComponent ],
+	declarations: [ AppComponent, WorkbookListComponent, WorkbookEditorComponent, EditHeaderFieldComponent, EditRowComponent, LoginComponent, SheetListComponent ],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,

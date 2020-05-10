@@ -1,11 +1,12 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { FirestoreService } from './firestore.service';
 import { of } from 'rxjs';
 import { mockWorkbookData } from '../../assets/mockData';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
+import { promise } from 'protractor';
 
 class MockAngularFirestoreService {
 	collection(name: string) {
@@ -274,4 +275,24 @@ describe('FirestoreService', () => {
 
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
+
+	it('should have a function for getting a sheet collection within a given workbook document', () => {
+		let falsyID = '';
+		let truthyID = 'truthy_id';
+
+		expect(falsyID).toBeFalsy();
+		expect(truthyID).toBeTruthy();
+
+		let afSpy = spyOn(service.firestore, 'collection').and.callThrough();
+		expect(afSpy).toHaveBeenCalledTimes(0);
+		service.getSheetCollection(truthyID);
+		expect(afSpy).toHaveBeenCalledTimes(1);
+		service.getSheetCollection(falsyID);
+		expect(afSpy).toHaveBeenCalledTimes(1);
+	});
+
+	// it('should have a function for adding a new sheet to the data base with the corresoponding firestore function', () => {
+	// 	let afs = TestBed.get(AngularFirestore);
+	// 	let fsSpy = spyOn(afs, 'add').and.callThrough();
+	// });
 });

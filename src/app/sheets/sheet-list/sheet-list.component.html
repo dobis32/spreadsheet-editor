@@ -1,0 +1,16 @@
+<h1>Workbook List</h1>
+<hr>
+<h3>Workbooks</h3>
+<ul>
+    <li *ngFor="let sheet of sheets">{{sheet.name}}</li>
+</ul>
+<hr>
+<h3>Add sheet</h3>
+<h5>Sheet name:</h5>
+<form [formGroup]="sheetForm" (ngSubmit)="addSheet(sheetForm)">
+    <label for="name">Name</label>
+    <input type="text" formControlName="name">
+    <button>Add</button>
+    <h3 *ngIf="invalidSheetForm" class="error-message">Invalid name</h3>
+</form>
+<button (click)="signOut()">sign out</button> temporary 

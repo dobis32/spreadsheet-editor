@@ -11,15 +11,18 @@ import { By } from '@angular/platform-browser';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditHeaderFieldComponent } from '../../modals/edit-header-field/edit-header-field.component';
-let mockWorkBookFactory: MockWorkBookFactory = new MockWorkBookFactory();
+
 class MockFirestoreService {
 	public signedIn: Observable<any>;
+	public mockWorkBookFactory: MockWorkBookFactory;
+
 	constructor() {
 		this.signedIn = of('userID');
+		this.mockWorkBookFactory = new MockWorkBookFactory();
 	}
 
 	public getWorkbookDocument(id: string) {
-		let data = mockWorkBookFactory.getWorkBookDocument();
+		let data = this.mockWorkBookFactory.getWorkBookDocument();
 		if (id) return of(data);
 		else return of(false);
 	}

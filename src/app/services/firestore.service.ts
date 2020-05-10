@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable, of } from 'rxjs';
 
@@ -17,6 +17,16 @@ export class FirestoreService {
 
 	getWorkbookCollection() {
 		return this.firestore.collection(`workbooks`).valueChanges({ idField: 'id' });
+	}
+
+	getSheetCollection(id: string) {
+		try {
+			if (!id) throw new Error('Invalid workbook ID');
+			return this.firestore.collection(`workbooks/${id}/sheets`).valueChanges({ idField: 'id' });
+		} catch (error) {
+			console.log(error);
+			return <Observable<any>>of(false);
+		}
 	}
 
 	async addWorkbook(data: any) {
@@ -85,6 +95,17 @@ export class FirestoreService {
 			return true;
 		} catch (error) {
 			console.log('Sign out failed', error);
+			return false;
+		}
+	}
+
+	async addSheet(workbookId: string, sheetData: any) {
+		try {
+			if (!workbookId || sheetData) throw new Error();
+			await this.firestore.collection(workbookId).add(sheetData);
+			return true;
+		} catch (error) {
+			console.log(error);
 			return false;
 		}
 	}

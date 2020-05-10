@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 	styleUrls: [ './workbook-list.component.scss' ]
 })
 export class WorkbookListComponent implements OnInit {
-	public workbooks: Array<any> = new Array<any>();
+	public workbooks: Array<any>;
 	public workbookForm: FormGroup;
 	public signedInAuth: Subscription;
 	constructor(
@@ -20,8 +20,8 @@ export class WorkbookListComponent implements OnInit {
 		public route: ActivatedRoute,
 		public router: Router
 	) {
+		this.workbooks = new Array<any>();
 		this.signedInAuth = this.firestoreService.signedIn.subscribe((user) => {
-			console.log('sign in auth sub', user);
 			if (user) {
 				this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
 					this.workbooks = workbooksData;
@@ -58,16 +58,14 @@ export class WorkbookListComponent implements OnInit {
 	}
 
 	editWorkbook(id: string) {
-		if (id) this.router.navigate([ '/workbooks/edit', id ]);
+		if (id) this.router.navigate([ 'workbooks', id, 'edit' ]);
 		else console.log('[ROUTER ERROR] Invalid ID parameter');
 	}
 
-	// signIn() {
-	// 	// temporary
-	// 	let result = this.firestoreService.signIn('scott.qwet@gmail.com', 'vander123');
-	// 	if (result) console.log('sign in successful');
-	// 	else console.log('sign in failed');
-	// }
+	viewWorkbook(id: string) {
+		if (id) this.router.navigate([ 'workbooks', id, 'list' ]);
+		else console.log('[ROUTER ERROR] Invalid ID parameter');
+	}
 
 	signOut() {
 		// temporary
