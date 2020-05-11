@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Observable, of } from 'rxjs';
 
@@ -78,7 +78,6 @@ export class FirestoreService {
 	async signIn(email: string, password: string) {
 		// temporary
 		try {
-			console.log('signing in');
 			if (!email || !password) throw new Error('Invalid email and/or password');
 			await this.afAuth.signInWithEmailAndPassword(email, password);
 			return true;
@@ -101,8 +100,19 @@ export class FirestoreService {
 
 	async addSheet(workbookId: string, sheetData: any) {
 		try {
-			if (!workbookId || sheetData) throw new Error();
-			await this.firestore.collection(workbookId).add(sheetData);
+			if (!workbookId || !sheetData) throw new Error('Invalid workbook ID or sheet data');
+			await this.firestore.collection(`/workbooks/${workbookId}/sheets`).add(sheetData);
+			return true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	}
+
+	async removeSheet(workbookId: string, sheetId: string) {
+		try {
+			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
+			await this.firestore.collection(`/workbooks/${workbookId}/sheets`).doc(sheetId).delete();
 			return true;
 		} catch (error) {
 			console.log(error);

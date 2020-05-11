@@ -1,12 +1,11 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { TestBed } from '@angular/core/testing';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { FirestoreService } from './firestore.service';
 import { of } from 'rxjs';
-import { mockWorkbookData } from '../../assets/mockData';
+import { mockWorkbookCollection } from '../../assets/mockData';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
-import { promise } from 'protractor';
 
 class MockAngularFirestoreService {
 	collection(name: string) {
@@ -15,7 +14,7 @@ class MockAngularFirestoreService {
 				let collection: Array<any> = [];
 				switch (name) {
 					case 'workbooks':
-						collection = mockWorkbookData;
+						collection = mockWorkbookCollection;
 						break;
 				}
 				return of(collection);
@@ -185,7 +184,7 @@ describe('FirestoreService', () => {
 	it('should have a function for adding a new workbook that calls the appropriate AngularFirestore function when a truthy arg is passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'add').and.callThrough();
-		let truthyWorkbookData = mockWorkbookData[0];
+		let truthyWorkbookData = mockWorkbookCollection[0];
 		service.uid = 'someID';
 		expect(truthyWorkbookData).toBeTruthy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
@@ -203,41 +202,41 @@ describe('FirestoreService', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
-	it('should have a function for removing a workbook that calls the appropriate AngularFirestore function when a truthy string arg is passed', async () => {
+	it('should have a function for removing a workbook that calls the appropriate AngularFirestore function when a truthy string arg is passed', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'delete').and.callThrough();
 		let truthyID = 'someID';
 		expect(truthyID).toBeTruthy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
-		await service.removeWorkbook(truthyID);
+		service.removeWorkbook(truthyID);
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a function for removing a workbook that does not call the appropriate AngularFirestore function when a falsy string arg is passed', async () => {
+	it('should have a function for removing a workbook that does not call the appropriate AngularFirestore function when a falsy string arg is passed', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'delete').and.callThrough();
 		let falsyID = '';
 		expect(falsyID).toBeFalsy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
-		await service.removeWorkbook(falsyID);
+		service.removeWorkbook(falsyID);
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
-	it('should have a function for retrieving a workbook document that calls the appropriate AngularFirestore function when a truthy string arg is passed', async () => {
+	it('should have a function for retrieving a workbook document that calls the appropriate AngularFirestore function when a truthy string arg is passed', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'valueChanges').and.callThrough();
 		expect(service.getWorkbookDocument).toBeTruthy();
 		expect(typeof service.getWorkbookDocument).toEqual('function');
-		await service.getWorkbookDocument('id');
+		service.getWorkbookDocument('id');
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a function for retrieving a workbook document that does not call the appropriate AngularFirestore function when a falsy string arg is passed', async () => {
+	it('should have a function for retrieving a workbook document that does not call the appropriate AngularFirestore function when a falsy string arg is passed', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'valueChanges').and.callThrough();
 		expect(service.getWorkbookDocument).toBeTruthy();
 		expect(typeof service.getWorkbookDocument).toEqual('function');
-		await service.getWorkbookDocument('');
+		service.getWorkbookDocument('');
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
@@ -252,7 +251,7 @@ describe('FirestoreService', () => {
 
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 
-		service.updateWorkbook('some_ID', mockWorkbookData);
+		service.updateWorkbook('some_ID', mockWorkbookCollection);
 
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
@@ -269,7 +268,7 @@ describe('FirestoreService', () => {
 
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 
-		service.updateWorkbook(falsyID, mockWorkbookData);
+		service.updateWorkbook(falsyID, mockWorkbookCollection);
 		service.updateWorkbook('some_id', falsyData);
 		service.updateWorkbook(falsyID, falsyData);
 
@@ -291,8 +290,45 @@ describe('FirestoreService', () => {
 		expect(afSpy).toHaveBeenCalledTimes(1);
 	});
 
-	// it('should have a function for adding a new sheet to the data base with the corresoponding firestore function', () => {
-	// 	let afs = TestBed.get(AngularFirestore);
-	// 	let fsSpy = spyOn(afs, 'add').and.callThrough();
-	// });
+	it('should have a function for adding a new sheet to the data base with the corresoponding firestore function when valid ID and data arguments are passed', () => {
+		let afs = TestBed.get(AngularFirestore);
+		let fsSpy = spyOn(afs, 'add').and.callThrough();
+
+		expect(service.addSheet).toBeTruthy();
+		expect(typeof service.addSheet).toEqual('function');
+		expect(fsSpy).toHaveBeenCalledTimes(0);
+
+		service.addSheet('some_id', { name: 'some_name', uid: 'some_uid', defaults: { headerFields: [], rows: [] } });
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		service.addSheet('', { name: 'some_name', uid: 'some_uid', defaults: { headerFields: [], rows: [] } });
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		service.addSheet('some_id', undefined);
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a function for adding a new sheet to the data base with the corresoponding firestore function when valid ID and data arguments are passed', async () => {
+		let afs = TestBed.get(AngularFirestore);
+		let fsSpy = spyOn(afs, 'delete').and.callThrough();
+
+		expect(service.removeSheet).toBeTruthy();
+		expect(typeof service.removeSheet).toEqual('function');
+		expect(fsSpy).toHaveBeenCalledTimes(0);
+
+		service.removeSheet('some_id', 'some_other_id');
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		service.removeSheet('', 'some_other_id');
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		service.removeSheet('some_id', '');
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+	});
 });

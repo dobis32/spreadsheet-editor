@@ -16,7 +16,7 @@ class MockFirestoreService {
 		this.mockWorkBookFactory = new MockWorkBookFactory();
 	}
 
-	getSheetCollection(id: string) {
+	public getSheetCollection(id: string) {
 		if (id)
 			return <Observable<any>>of([
 				{ name: 'sheet1', id: 'sheet_id1' },
@@ -26,12 +26,13 @@ class MockFirestoreService {
 		else return <Observable<any>>of([]);
 	}
 
-	getWorkbookDocument(id: string) {
-		if (id) return of(this.mockWorkBookFactory.getWorkBookDocument());
-		else return of(false);
+	public getWorkbookDocument(id: string) {
+		let data = this.mockWorkBookFactory.getWorkBookDocument();
+		if (id) return <Observable<any>>of(data);
+		else return <Observable<any>>of(false);
 	}
 
-	async addSheet(id: string, data: any) {
+	public async addSheet(id: string, data: any) {
 		try {
 			if (!id || !data) throw new Error();
 			return true;
@@ -96,26 +97,45 @@ describe('SheetListComponent', () => {
 
 		let fsSpy = spyOn(component.firestoreService, 'getSheetCollection').and.callThrough();
 
+		expect(fsSpy).toHaveBeenCalledTimes(0);
+
 		component.sheets = undefined;
 
 		expect(component.sheets).toBeFalsy();
 
 		component.getSheetData(component.workbookId);
 
-		expect(fsSpy).toHaveBeenCalled();
+		expect(fsSpy).toHaveBeenCalledTimes(1);
 		expect(component.sheets).toBeTruthy();
 	});
 
+	it('should have a function for getting sheet data of the workbook with the corresponding id from the firestore service that navigates to /workbook/list when there a falsy ID is passed as argument', () => {
+		let fsSpy = spyOn(component.firestoreService, 'getSheetCollection').and.callThrough();
+		let routerSpy = spyOn(component.router, 'navigate').and.callFake((routeParams: Array<any>) => {
+			return Promise.resolve(true);
+		});
+
+		expect(fsSpy).toHaveBeenCalledTimes(0);
+
+		component.getSheetData(''); // falsy value
+
+		expect(fsSpy).toHaveBeenCalledTimes(0);
+		expect(routerSpy).toHaveBeenCalledTimes(1);
+		expect(routerSpy).toHaveBeenCalledWith([ '/workbooks/list' ]);
+	});
+
 	// Get this P.O.S. working (corresponding mock service function is returning nothing????)
-	// it('should have a function for getting the data of the current work book by calling the corresponding firestore service function with the current workbook ID as the arg', () => {
-	// 	expect(component.getWorkbookData).toBeTruthy();
-	// 	expect(typeof component.getWorkbookData).toEqual('function');
-	// 	let fsSpy = spyOn(component.firestoreService, 'getWorkbookDocument');
-	// 	expect(fsSpy).toHaveBeenCalledTimes(0);
-	// 	component.getWorkbookData(component.workbookId);
-	// 	expect(fsSpy).toHaveBeenCalledTimes(0);
-	// 	expect(fsSpy).toHaveBeenCalledWith(component.workbookId);
-	// });
+	it('should have a function for getting the data of the current work book by calling the corresponding firestore service function with the current workbook ID as the arg', () => {
+		expect(component.getWorkbookData).toBeTruthy();
+		expect(typeof component.getWorkbookData).toEqual('function');
+
+		let fsSpy = spyOn(component.firestoreService, 'getWorkbookDocument').and.callThrough();
+
+		component.getWorkbookData(component.workbookId);
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+		expect(fsSpy).toHaveBeenCalledWith(component.workbookId);
+	});
 
 	it('should have a function for adding a sheet that calls the corresponding firestore service function when the sheet form is valid', () => {
 		let fsSpy = spyOn(component.firestoreService, 'addSheet').and.callThrough();

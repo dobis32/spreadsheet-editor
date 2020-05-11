@@ -65,16 +65,40 @@ export class SheetListComponent implements OnInit {
 		try {
 			this.invalidSheetForm = false;
 			if (!fg.valid) throw new Error('Invalid form');
+			if (!this.workbook || !this.workbook.defaults) throw new Error('Invalid workbook');
+			let headerFields = this.workbook.defaults.headerFields;
+			let rows = this.workbook.defaults.rows;
 			let data = {
+				uid: this.workbook.uid,
 				name: fg.value.name,
-				headerFields: this.workbook.defaults.headerFields,
-				rows: this.workbook.defaults.rows
+				headerFields: Array.isArray(headerFields) ? headerFields : [],
+				rows: Array.isArray(rows) ? rows : []
 			};
 			await this.firestoreService.addSheet(this.workbookId, data);
 			return true;
 		} catch (error) {
 			console.log(error);
 			this.invalidSheetForm = true;
+		}
+	}
+
+	async removeSheet(workbookId: string, sheetId: string) {
+		console.log(workbookId, sheetId);
+		try {
+			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
+			const result = await this.firestoreService.removeSheet(workbookId, sheetId);
+			if (!result) throw new Error('Could not remove sheet');
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	editSheet(workbookId: string, sheetId: string) {
+		try {
+			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
+			this.router.navigate([ 'workbooks', workbookId, 'sheets', sheetId ]);
+		} catch (error) {
+			console.log(error);
 		}
 	}
 

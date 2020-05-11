@@ -1,4 +1,4 @@
-export let mockWorkbookData = [
+export let mockWorkbookCollection = [
 	{ name: 'book1', id: 'id1', uid: 'uid1' },
 	{ name: 'book2', id: 'id2', uid: 'uid2' },
 	{ name: 'book3', id: 'id3', uid: 'uid3' },
@@ -39,7 +39,7 @@ export class MockWorkBookFactory {
 		}
 	];
 
-	getWorkBookDocument() {
+	getWorkBookDocument(n?: number) {
 		let workbook: any = { ...this.mockWorkbookDocument };
 		workbook.defaults = { rows: new Array<any>(), headerFields: new Array<any>() };
 		this.mockRows.forEach((row) => {
@@ -50,6 +50,8 @@ export class MockWorkBookFactory {
 		});
 		return workbook;
 	}
+
+	getWorkbookCollection;
 }
 
 // export let mockWorkbookDocument = {

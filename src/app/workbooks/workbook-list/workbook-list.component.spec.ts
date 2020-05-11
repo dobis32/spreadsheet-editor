@@ -3,19 +3,22 @@ import { WorkbookListComponent } from './workbook-list.component';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { of, Observable } from 'rxjs';
-import { mockWorkbookData } from '../../../assets/mockData';
+import { mockWorkbookCollection } from '../../../assets/mockData';
 import { RouterTestingModule } from '@angular/router/testing';
 import { routes } from '../../app-routing.module';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MockWorkBookFactory } from 'src/assets/mockData';
 
 class MockFirestoreService {
 	public signedIn: Observable<any>;
+	public mockWorkBookFactory: MockWorkBookFactory;
 
 	constructor() {
 		this.signedIn = of('userID');
+		this.mockWorkBookFactory = new MockWorkBookFactory();
 	}
 	getWorkbookCollection() {
-		return of(mockWorkbookData);
+		return of(mockWorkbookCollection);
 	}
 
 	addWorkbook(workbook: any) {
@@ -112,7 +115,7 @@ describe('WorkbookListComponent', () => {
 	});
 
 	it('should call getWorkbookCollection function of the firestore service', async () => {
-		let mockData: Array<any> = mockWorkbookData;
+		let mockData: Array<any> = mockWorkbookCollection;
 		let fireStoreSpy = spyOn(
 			fixture.debugElement.injector.get(FirestoreService),
 			'getWorkbookCollection'
