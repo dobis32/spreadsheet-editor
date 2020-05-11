@@ -13,9 +13,10 @@ import { EditHeaderFieldComponent } from './modals/edit-header-field/edit-header
 import { EditRowComponent } from './modals/edit-row/edit-row.component';
 import { LoginComponent } from './login/login.component';
 import { SheetListComponent } from './sheets/sheet-list/sheet-list.component';
+import { SheetEditorComponent } from './sheets/sheet-editor/sheet-editor.component';
 
 @NgModule({
-	declarations: [ AppComponent, WorkbookListComponent, WorkbookEditorComponent, EditHeaderFieldComponent, EditRowComponent, LoginComponent, SheetListComponent ],
+	declarations: [ AppComponent, WorkbookListComponent, WorkbookEditorComponent, EditHeaderFieldComponent, EditRowComponent, LoginComponent, SheetListComponent, SheetEditorComponent ],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
