@@ -6,7 +6,7 @@
   </div>
   <div class="modal-body">
     <form class="ml-3" [formGroup]="rowForm" (ngSubmit)="save(rowForm)">
-        <div *ngFor="let headerField of workbook.defaults.headerFields" class="row mb-3">
+        <div *ngFor="let headerField of data.headerFields" class="row mb-3">
             <label class="mt-1" for="{{headerField.name}}">{{headerField.name | titlecase}}</label>
             <input class="ml-2" type="{{headerField.text ? 'text' : 'number'}}" name="{{headerField.name}}" formControlName="{{headerField.name}}">
         </div>

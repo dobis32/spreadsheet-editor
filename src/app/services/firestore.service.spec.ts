@@ -298,11 +298,11 @@ describe('FirestoreService', () => {
 		expect(typeof service.addSheet).toEqual('function');
 		expect(fsSpy).toHaveBeenCalledTimes(0);
 
-		service.addSheet('some_id', { name: 'some_name', uid: 'some_uid', defaults: { headerFields: [], rows: [] } });
+		service.addSheet('some_id', { name: 'some_name', uid: 'some_uid', headerFields: [], rows: [] });
 
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 
-		service.addSheet('', { name: 'some_name', uid: 'some_uid', defaults: { headerFields: [], rows: [] } });
+		service.addSheet('', { name: 'some_name', uid: 'some_uid', headerFields: [], rows: [] });
 
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 
@@ -328,6 +328,45 @@ describe('FirestoreService', () => {
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 
 		service.removeSheet('some_id', '');
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a function for retrieving a sheet document with the corresponding firestore function when valid workbook ID and sheet ID are passed in', () => {
+		let afs = TestBed.get(AngularFirestore);
+		let fsSpy = spyOn(afs, 'valueChanges').and.callThrough();
+
+		expect(service.getSheetDocument).toBeTruthy();
+		expect(typeof service.getSheetCollection).toEqual('function');
+		expect(fsSpy).toHaveBeenCalledTimes(0);
+
+		service.getSheetDocument('some_id', 'some_other_id');
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		service.getSheetDocument('', 'some_other_id');
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+		service.getSheetDocument('some_id', '');
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a function for updating a sheet document that calls the appropriate Firestore function when valid args are passed', () => {
+		let afs = TestBed.get(AngularFirestore);
+		let fsSpy = spyOn(afs, 'update');
+
+		expect(fsSpy).toHaveBeenCalledTimes(0);
+
+		service.updateSheet('workbook_id', 'sheet_id', { data: 'some_data' });
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		service.updateSheet('workbook_id', 'sheet_id', undefined);
+
+		service.updateSheet('', 'sheet_id', { data: 'some_data' });
+
+		service.updateSheet('workbook_id', '', { data: 'some_data' });
 
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 	});

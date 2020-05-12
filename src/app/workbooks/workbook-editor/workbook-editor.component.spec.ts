@@ -86,7 +86,7 @@ describe('WorkbookEditorComponent', () => {
 		expect(fixture.debugElement.injector.get(FirestoreService)).toBeTruthy();
 	});
 
-	it('should call getWorkbookDocument function of the firestore service, passing the current workbook ID string as the argument', async () => {
+	it('should call the function the appropriate Firestore service function to get a workbook book with corresponding workbook ID passed as the argument', async () => {
 		let fireStoreSpy = spyOn(
 			fixture.debugElement.injector.get(FirestoreService),
 			'getWorkbookDocument'
@@ -103,7 +103,7 @@ describe('WorkbookEditorComponent', () => {
 
 	it('should use the injected activated route to get the current workbook ID', async () => {
 		let id: string = await new Promise((resolve) => {
-			component.route.params.subscribe((params) => {
+			component.activatedRoute.params.subscribe((params) => {
 				resolve(params['id']);
 			});
 		});
@@ -112,12 +112,12 @@ describe('WorkbookEditorComponent', () => {
 
 	it('should have the current workbooks default headers rendered to the DOM', async () => {
 		const headerElements = fixture.debugElement.queryAll(By.css('.default-header-fields'));
-		expect(component.currentWorkbook.defaults.headerFields.length).toEqual(headerElements.length);
+		expect(component.currentWorkbook.headerFields.length).toEqual(headerElements.length);
 	});
 
 	it('should have the current workbooks default rows rendered to the DOM', async () => {
 		const rowElements = fixture.debugElement.queryAll(By.css('.default-rows'));
-		expect(component.currentWorkbook.defaults.rows.length).toEqual(rowElements.length);
+		expect(component.currentWorkbook.rows.length).toEqual(rowElements.length);
 	});
 
 	it('should have an updateWorkbookName function', () => {
@@ -133,16 +133,16 @@ describe('WorkbookEditorComponent', () => {
 		).and.callThrough();
 		component.updateWorkbookName(component.nameForm);
 		expect(firestoreSpy).toHaveBeenCalledTimes(1);
-		component.nameForm.value.name = ''; // falsy value
+		component.nameForm.value.name = '';
 		component.updateWorkbookName(component.nameForm);
-		expect(firestoreSpy).toHaveBeenCalledTimes(1); // expect to not have been called another time
+		expect(firestoreSpy).toHaveBeenCalledTimes(1);
 	});
 
 	it('should have a function that should open the NgbModal with EditHeaderFieldComponent', () => {
 		expect(component.openEditFieldModal).toBeTruthy();
 		expect(typeof component.openEditFieldModal).toEqual('function');
 		let modalSpy = spyOn(fixture.debugElement.injector.get(NgbModal), 'open').and.callThrough();
-		let data = component.currentWorkbook.defaults.headerFields[0];
+		let data = component.currentWorkbook.headerFields[0];
 		component.openEditFieldModal(data);
 		expect(modalSpy).toHaveBeenCalledTimes(1);
 		expect(modalSpy).toHaveBeenCalledWith(EditHeaderFieldComponent);
@@ -155,5 +155,20 @@ describe('WorkbookEditorComponent', () => {
 		component.openEditFieldModal();
 		expect(modalSpy).toHaveBeenCalledTimes(1);
 		expect(modalSpy).toHaveBeenCalledWith(EditHeaderFieldComponent);
+	});
+
+	it('should have a function to clear name update messages', () => {
+		expect(component.clearUpdateMessages).toBeTruthy();
+		expect(typeof component.clearUpdateMessages).toEqual('function');
+
+		component.invalidNameForm = true;
+		component.nameUpdateSuccess = true;
+		component.nameUpdateFailure = true;
+
+		expect(component.invalidNameForm && component.nameUpdateSuccess && component.nameUpdateFailure).toBeTrue();
+
+		component.clearUpdateMessages();
+
+		expect(component.invalidNameForm || component.nameUpdateSuccess || component.nameUpdateFailure).toBeFalse();
 	});
 });

@@ -18,24 +18,29 @@ export class WorkbookEditorComponent implements OnInit {
 	public workbookId: string;
 	public signInAuth: Subscription;
 	public nameForm: FormGroup;
-	public workbookName: Promise<string>;
+	public invalidNameForm: boolean;
+	public nameUpdateFailure: boolean;
+	public nameUpdateSuccess: boolean;
 
 	constructor(
 		public formBuilder: FormBuilder,
 		public firestoreService: FirestoreService,
-		public route: ActivatedRoute,
+		public activatedRoute: ActivatedRoute,
 		public router: Router,
 		public modalService: NgbModal
 	) {
+		this.invalidNameForm = false;
+		this.nameUpdateFailure = false;
+		this.nameUpdateSuccess = false;
 		this.nameForm = this.formBuilder.group({ name: '' });
 		this.signInAuth = this.firestoreService.signedIn.subscribe(async (user) => {
 			if (user) {
-				this.route.params.subscribe((params) => {
+				this.activatedRoute.params.subscribe((params) => {
 					this.workbookId = params['id'];
 				});
-				this.firestoreService.getWorkbookDocument(this.workbookId).subscribe((workbookDoc) => {
-					this.currentWorkbook = <any>workbookDoc;
-					this.workbookName = Promise.resolve(this.currentWorkbook.name);
+				this.firestoreService.getWorkbookDocument(this.workbookId).subscribe((workbookDoc: any) => {
+					this.currentWorkbook = workbookDoc;
+					console.log(this.currentWorkbook);
 					this.nameForm.setValue({ name: this.currentWorkbook.name });
 				});
 			} else {
@@ -48,12 +53,19 @@ export class WorkbookEditorComponent implements OnInit {
 
 	addRow() {}
 
+	clearUpdateMessages() {
+		this.invalidNameForm = false;
+		this.nameUpdateFailure = false;
+		this.nameUpdateSuccess = false;
+	}
+
 	openEditFieldModal(headerField?: any) {
 		let headerFieldToEdit = headerField ? headerField : { name: '', text: true, value: '' };
 		const modalRef = this.modalService.open(EditHeaderFieldComponent);
 		modalRef.componentInstance.fieldToEdit = headerFieldToEdit;
 		modalRef.componentInstance.workbookId = this.workbookId;
-		modalRef.componentInstance.workbook = this.currentWorkbook;
+		// modalRef.componentInstance.workbook = this.currentWorkbook;
+		modalRef.componentInstance.data = this.currentWorkbook;
 		modalRef.componentInstance.fs = this.firestoreService;
 	}
 
@@ -63,12 +75,13 @@ export class WorkbookEditorComponent implements OnInit {
 		modalRef.componentInstance.rowToEdit = rowToEdit;
 		modalRef.componentInstance.workbookId = this.workbookId;
 		modalRef.componentInstance.workbook = this.currentWorkbook;
+		// modalRef.componentInstance.data = this.currentWorkbook;
 		modalRef.componentInstance.fs = this.firestoreService;
 	}
 
 	getDefaultRow() {
 		let row = {};
-		this.currentWorkbook.defaults.headerFields.forEach((headerField) => {
+		this.currentWorkbook.headerFields.forEach((headerField) => {
 			row[headerField.name] = headerField.text ? headerField.value : parseFloat(headerField.value);
 		});
 		return row;

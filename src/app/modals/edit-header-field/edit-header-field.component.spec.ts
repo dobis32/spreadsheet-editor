@@ -17,6 +17,15 @@ class MockFireStoreService {
 			return false;
 		}
 	}
+
+	async updateSheet(id: string, data: any) {
+		try {
+			if (!id || !data) throw new Error();
+			else return true;
+		} catch (error) {
+			return false;
+		}
+	}
 }
 
 describe('EditHeaderFieldComponent', () => {
@@ -42,11 +51,12 @@ describe('EditHeaderFieldComponent', () => {
 		mockWorkbook = mockWorkbookFactory.getWorkBookDocument();
 		fixture = TestBed.createComponent(EditHeaderFieldComponent);
 		component = fixture.componentInstance;
-		component.fieldToEdit = mockWorkbook.defaults.headerFields[0];
-		component.workbook = mockWorkbook;
-		component.workbookId = component.workbook.id;
+		component.fieldToEdit = mockWorkbook.headerFields[0];
+		component.data = mockWorkbook;
+		component.workbookId = component.data.id;
+		component.sheetId = 'someID';
 		component.fs = TestBed.get(FirestoreService);
-		delete component.workbook.id;
+		delete component.data.id;
 		fixture.detectChanges();
 	});
 
@@ -81,12 +91,9 @@ describe('EditHeaderFieldComponent', () => {
 
 		component.headerFieldForm.setValue(fgData);
 
-		let result = component.setFieldToEditValues(
-			mockWorkbook.defaults.headerFields[0],
-			component.headerFieldForm.value
-		);
+		let result = component.setFieldToEditValues(mockWorkbook.headerFields[0], component.headerFieldForm.value);
 
-		expect(result).toEqual(mockWorkbook.defaults.headerFields[0]);
+		expect(result).toEqual(mockWorkbook.headerFields[0]);
 		expect(result.name).toEqual(fgData.name);
 		expect(result.text).toEqual(fgData.text);
 		expect(result.value).toEqual(fgData.value);
@@ -97,16 +104,13 @@ describe('EditHeaderFieldComponent', () => {
 		let fgData = { name: 'new_name', text: false, value: '0' }; // note that the function will parse the value to a number, since 'text' is false
 		component.headerFieldForm.setValue(fgData);
 
-		let result = component.setFieldToEditValues(
-			mockWorkbook.defaults.headerFields[0],
-			component.headerFieldForm.value
-		);
+		let result = component.setFieldToEditValues(mockWorkbook.headerFields[0], component.headerFieldForm.value);
 
 		expect(result.value).toEqual(parseFloat(component.headerFieldForm.value.value));
 		expect(typeof result.value != 'string').toBeTrue();
 
 		component.headerFieldForm.setValue({ name: 'new_name', text: true, value: 'some_new_value' });
-		result = component.setFieldToEditValues(mockWorkbook.defaults.headerFields[0], component.headerFieldForm.value);
+		result = component.setFieldToEditValues(mockWorkbook.headerFields[0], component.headerFieldForm.value);
 
 		expect(result.value).toEqual(component.headerFieldForm.value.value);
 		expect(typeof result.value == 'string').toBeTrue();
@@ -114,8 +118,8 @@ describe('EditHeaderFieldComponent', () => {
 
 	it('should have a function that updates and returns the default row data corresponding to the meta data of an updated header field', () => {
 		let updatedField = { name: 'new_name', text: true, value: 'abc' };
-		let rows = mockWorkbook.defaults.rows;
-		let oldField = mockWorkbook.defaults.headerFields[1];
+		let rows = mockWorkbook.rows;
+		let oldField = mockWorkbook.headerFields[1];
 
 		expect(rows[0][updatedField.name] == undefined).toBeTruthy();
 
@@ -128,12 +132,28 @@ describe('EditHeaderFieldComponent', () => {
 		expect(result).toEqual([]);
 	});
 
-	it('should have a save function that updates header data, updates row data, and updates the workbook document in firestore', async () => {
+	it('should have a save function that updates header data, updates row data, and updates the workbook document in firestore (when the component has a falsy sheet ID)', async () => {
 		let updateHeaderSpy = spyOn(component, 'setFieldToEditValues').and.callThrough();
 		let updateRowSpy = spyOn(component, 'updateRows').and.callThrough();
 		let fsSpy = spyOn(component.fs, 'updateWorkbook').and.callThrough();
+		component.sheetId = undefined;
 
-		component.headerFieldForm.setValue(mockWorkbook.defaults.headerFields[1]);
+		component.headerFieldForm.setValue(mockWorkbook.headerFields[1]);
+		component.save(component.headerFieldForm);
+
+		await fixture.whenStable();
+
+		expect(updateHeaderSpy).toHaveBeenCalledTimes(1);
+		expect(updateRowSpy).toHaveBeenCalledTimes(1);
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a save function that updates header data, updates row data, and updates the sheet document in firestore (when the component has a truthy sheet ID)', async () => {
+		let updateHeaderSpy = spyOn(component, 'setFieldToEditValues').and.callThrough();
+		let updateRowSpy = spyOn(component, 'updateRows').and.callThrough();
+		let fsSpy = spyOn(component.fs, 'updateSheet').and.callThrough();
+
+		component.headerFieldForm.setValue(mockWorkbook.headerFields[1]);
 		component.save(component.headerFieldForm);
 
 		await fixture.whenStable();
@@ -147,8 +167,8 @@ describe('EditHeaderFieldComponent', () => {
 		expect(component.getFiltered).toBeTruthy();
 		expect(typeof component.getFiltered).toEqual('function');
 
-		let headerFieldToFilter = { ...mockWorkbook.defaults.headerFields[1] };
-		let result = component.getFiltered(mockWorkbook.defaults.headerFields, headerFieldToFilter);
+		let headerFieldToFilter = { ...mockWorkbook.headerFields[1] };
+		let result = component.getFiltered(mockWorkbook.headerFields, headerFieldToFilter);
 		let wasNotFiltered = result.some((headerField) => {
 			return headerField == headerFieldToFilter;
 		});
@@ -156,14 +176,25 @@ describe('EditHeaderFieldComponent', () => {
 		expect(wasNotFiltered).toBeFalse();
 	});
 
-	it('should have a function to delete a header field', async () => {
-		expect(component.deleteHeaderField).toBeTruthy();
-		expect(typeof component.deleteHeaderField).toEqual('function');
-
+	it('should have a function to delete a header field that calls the update workbook Firestore service function when the component has no truthy sheet ID', async () => {
+		component.sheetId = undefined;
 		let fsSpy = spyOn(component.fs, 'updateWorkbook').and.callThrough();
-		component.deleteHeaderField({ ...mockWorkbook.defaults.headerFields[1] });
+		component.deleteHeaderField({ ...mockWorkbook.headerFields[1] });
 
 		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		expect(component.deleteHeaderField).toBeTruthy();
+		expect(typeof component.deleteHeaderField).toEqual('function');
+	});
+
+	it('should have a function to delete a header field that calls the update sheet Firestore service function when the component has a truthy sheet ID', async () => {
+		let fsSpy = spyOn(component.fs, 'updateSheet').and.callThrough();
+		component.deleteHeaderField({ ...mockWorkbook.headerFields[1] });
+
+		expect(fsSpy).toHaveBeenCalledTimes(1);
+
+		expect(component.deleteHeaderField).toBeTruthy();
+		expect(typeof component.deleteHeaderField).toEqual('function');
 	});
 
 	it('should have a function to return data of a single row which has had a specified field value parsed to a number; if the specified field cannot be parsed, it will be set to zero', () => {

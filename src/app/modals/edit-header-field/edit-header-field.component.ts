@@ -11,7 +11,9 @@ import { FirestoreService } from 'src/app/services/firestore.service';
 export class EditHeaderFieldComponent implements OnInit {
 	@Input() fieldToEdit: any;
 	@Input() workbookId: string;
-	@Input() workbook: any;
+	@Input() sheetId: string;
+	// @Input() workbook: any;
+	@Input() data: any;
 	@Input() fs: FirestoreService;
 	public updateFailure: boolean;
 	public updateSuccess: boolean;
@@ -32,11 +34,13 @@ export class EditHeaderFieldComponent implements OnInit {
 	async save(fg: FormGroup) {
 		this.clearUpdateMessages();
 		this.fieldToEdit = this.setFieldToEditValues(this.fieldToEdit, fg.value);
-		if (!this.workbook.defaults.headerFields.some((field) => field == this.fieldToEdit)) {
-			this.workbook.defaults.headerFields.push(this.fieldToEdit);
+		if (!this.data.headerFields.some((field) => field == this.fieldToEdit)) {
+			this.data.headerFields.push(this.fieldToEdit);
 		}
-		this.workbook.defaults.rows = this.updateRows(this.fieldToEdit, this.workbook.defaults.rows, this.initialField);
-		let result = this.fs.updateWorkbook(this.workbookId, this.workbook);
+		this.data.rows = this.updateRows(this.fieldToEdit, this.data.rows, this.initialField);
+		let result;
+		if (this.sheetId) result = this.fs.updateSheet(this.workbookId, this.sheetId, this.data);
+		else result = this.fs.updateWorkbook(this.workbookId, this.data);
 		if (result) this.updateSuccess = true;
 		else this.updateFailure = true;
 	}
@@ -62,7 +66,11 @@ export class EditHeaderFieldComponent implements OnInit {
 
 	updateRows(updatedField: any, rows: Array<any>, oldField: any) {
 		rows.forEach((row) => {
-			if (oldField.name != updatedField.name) {
+			if (oldField.name == '') {
+				// new field
+				row[updatedField.name] = updatedField.value;
+			} else if (oldField.name != updatedField.name) {
+				// existing field
 				row[updatedField.name] = row[oldField.name];
 				delete row[oldField.name];
 			}
@@ -84,14 +92,11 @@ export class EditHeaderFieldComponent implements OnInit {
 
 	async deleteHeaderField(headerFieldToDelete: any) {
 		this.clearUpdateMessages();
-		this.workbook.defaults.headerFields = this.getFiltered(
-			this.workbook.defaults.headerFields,
-			headerFieldToDelete
-		);
-		// update rows
-		this.workbook.defaults.rows = this.deleteFromRows(this.workbook.defaults.rows, headerFieldToDelete.name);
-		// update the workbook
-		let result = await this.fs.updateWorkbook(this.workbookId, this.workbook);
+		this.data.headerFields = this.getFiltered(this.data.headerFields, headerFieldToDelete);
+		this.data.rows = this.deleteFromRows(this.data.rows, headerFieldToDelete.name);
+		let result;
+		if (this.sheetId) result = await this.fs.updateSheet(this.workbookId, this.sheetId, this.data);
+		else result = await this.fs.updateWorkbook(this.workbookId, this.data);
 		if (result) this.activeModal.close();
 		else this.updateFailure = true;
 	}

@@ -65,10 +65,31 @@ export class FirestoreService {
 		}
 	}
 
+	async updateSheet(bookId: string, sheetId: string, data: any) {
+		try {
+			if (!bookId || !sheetId || !data) throw new Error('Invalid ID or data');
+			await this.firestore.collection(`/workbooks/${bookId}/sheets`).doc(sheetId).update(data);
+			return true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	}
+
 	getWorkbookDocument(id: string) {
 		try {
 			if (!id) throw new Error('Invalid workbook ID');
 			return this.firestore.collection('workbooks').doc(id).valueChanges();
+		} catch (error) {
+			console.log(error);
+			return of(false);
+		}
+	}
+
+	getSheetDocument(workbookId: string, sheetId: string) {
+		try {
+			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
+			return this.firestore.collection(`workbooks/${workbookId}/sheets`).doc(sheetId).valueChanges();
 		} catch (error) {
 			console.log(error);
 			return of(false);

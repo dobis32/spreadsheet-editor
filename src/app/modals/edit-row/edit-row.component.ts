@@ -11,7 +11,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 export class EditRowComponent implements OnInit {
 	@Input() rowToEdit: any;
 	@Input() workbookId: string;
-	@Input() workbook: any;
+	@Input() sheetId: string;
+	@Input() data: any;
 	@Input() fs: FirestoreService;
 	public rowForm: FormGroup;
 	public rowKeys: Array<any>;
@@ -30,10 +31,12 @@ export class EditRowComponent implements OnInit {
 	save(fg: FormGroup) {
 		this.updateFailure = false;
 		this.rowToEdit = this.setRowToEditValues(this.rowToEdit, fg.value);
-		if (!this.workbook.defaults.rows.some((row) => row == this.rowToEdit)) {
-			this.workbook.defaults.rows.push(this.rowToEdit);
+		if (!this.data.rows.some((row) => row == this.rowToEdit)) {
+			this.data.rows.push(this.rowToEdit);
 		}
-		let result = this.fs.updateWorkbook(this.workbookId, this.workbook);
+		let result;
+		if (this.sheetId) result = this.fs.updateSheet(this.workbookId, this.sheetId, this.data);
+		else result = this.fs.updateWorkbook(this.workbookId, this.data);
 		if (result) this.activeModal.close();
 		else this.updateFailure = true;
 	}
@@ -58,9 +61,10 @@ export class EditRowComponent implements OnInit {
 
 	async deleteRow(rowToDelete: any) {
 		this.clearUpdateMessages();
-		this.workbook.defaults.rows = this.getFiltered(this.workbook.defaults.rows, rowToDelete);
-		this.rowForm = this.formBuilder.group(this.workbook.defaults.headerfields);
-		let result = await this.fs.updateWorkbook(this.workbookId, this.workbook);
+		this.data.rows = this.getFiltered(this.data.rows, rowToDelete);
+		let result;
+		if (this.sheetId) result = await this.fs.updateSheet(this.workbookId, this.sheetId, this.data);
+		else result = await this.fs.updateWorkbook(this.workbookId, this.data);
 		if (result) this.activeModal.close();
 		else this.updateFailure = true;
 	}

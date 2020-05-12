@@ -40,15 +40,60 @@ export class MockWorkBookFactory {
 	];
 
 	getWorkBookDocument(n?: number) {
-		let workbook: any = { ...this.mockWorkbookDocument };
-		workbook.defaults = { rows: new Array<any>(), headerFields: new Array<any>() };
+		let workbook: any = { ...this.mockWorkbookDocument, rows: new Array<any>(), headerFields: new Array<any>() };
 		this.mockRows.forEach((row) => {
-			workbook.defaults.rows.push({ ...row });
+			workbook.rows.push({ ...row });
 		});
 		this.mockHeaderFields.forEach((headerField) => {
-			workbook.defaults.headerFields.push({ ...headerField });
+			workbook.headerFields.push({ ...headerField });
 		});
 		return workbook;
+	}
+}
+
+export class MockSheetFactory {
+	constructor() {}
+
+	private mockSheetDocument = {
+		id: 'id',
+		uid: 'uid',
+		name: 'name'
+	};
+
+	private mockRows = [
+		{
+			field1: 'some_value',
+			field2: 3000.001
+		},
+		{
+			field1: 'some_other_value',
+			field2: 123
+		}
+	];
+
+	private mockHeaderFields = [
+		{
+			name: 'field1',
+			text: true,
+			value: 'some_value'
+		},
+		{
+			name: 'field2',
+			text: false,
+			value: 300.001
+		}
+	];
+
+	getSheetDocument(n?: number) {
+		let sheet: any = {};
+		sheet = { ...this.mockSheetDocument, rows: new Array<any>(), headerFields: new Array<any>() };
+		this.mockRows.forEach((row) => {
+			sheet.rows.push({ ...row });
+		});
+		this.mockHeaderFields.forEach((headerField) => {
+			sheet.headerFields.push({ ...headerField });
+		});
+		return sheet;
 	}
 
 	getWorkbookCollection;

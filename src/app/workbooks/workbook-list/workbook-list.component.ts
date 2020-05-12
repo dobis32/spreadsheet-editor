@@ -63,7 +63,7 @@ export class WorkbookListComponent implements OnInit {
 	}
 
 	viewWorkbook(id: string) {
-		if (id) this.router.navigate([ 'workbooks', id, 'list' ]);
+		if (id) this.router.navigate([ 'workbooks', id, 'sheets', 'list' ]);
 		else console.log('[ROUTER ERROR] Invalid ID parameter');
 	}
 

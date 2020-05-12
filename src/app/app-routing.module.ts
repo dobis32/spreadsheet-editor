@@ -4,6 +4,7 @@ import { WorkbookListComponent } from './workbooks/workbook-list/workbook-list.c
 import { WorkbookEditorComponent } from './workbooks/workbook-editor/workbook-editor.component';
 import { LoginComponent } from './login/login.component';
 import { SheetListComponent } from './sheets/sheet-list/sheet-list.component';
+import { SheetEditorComponent } from './sheets/sheet-editor/sheet-editor.component';
 
 export const routes: Routes = [
 	{
@@ -19,12 +20,12 @@ export const routes: Routes = [
 		component: WorkbookEditorComponent
 	},
 	{
-		path: 'workbooks/:workbookId/list',
+		path: 'workbooks/:workbookId/sheets/list',
 		component: SheetListComponent
 	},
 	{
-		path: 'workbooks/edit/:id',
-		component: WorkbookEditorComponent
+		path: 'workbooks/:workbookId/sheets/:sheetId/edit',
+		component: SheetEditorComponent
 	},
 	{ path: '**', component: LoginComponent }
 ];

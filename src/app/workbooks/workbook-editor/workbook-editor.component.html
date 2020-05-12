@@ -4,11 +4,14 @@
 <form [formGroup]="nameForm" (ngSubmit)="updateWorkbookName(nameForm)">
     <input type="text" formControlName="name">
     <button>Save</button>
+    <h3 class="error-message" *ngIf="invalidNameForm">Invalid name.</h3>
+    <h3 class="error-message" *ngIf="nameUpdateFailure">Failed to update name.</h3>
+    <h3 class="success-message" *ngIf="nameUpdateSuccess">Name updated successfully.</h3>
 </form>
 <h3>Default Header Fields:</h3>
 <button (click)="openEditFieldModal()">Add</button>
-<ul *ngIf="currentWorkbook && currentWorkbook.defaults">
-    <li *ngFor="let headerField of currentWorkbook.defaults.headerFields">
+<ul *ngIf="currentWorkbook">
+    <li *ngFor="let headerField of currentWorkbook.headerFields">
         {{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}
         <button (click)="openEditFieldModal(headerField)">Edit</button>
     </li>
@@ -16,14 +19,14 @@
 <hr>
 <h3>Default Rows:</h3>        
 <button (click)="openEditRowModal()">Add</button>
-<table *ngIf="currentWorkbook && currentWorkbook.defaults">
+<table *ngIf="currentWorkbook">
     <tr>
-        <th class="default-header-fields" *ngFor="let headerField of currentWorkbook.defaults.headerFields">
+        <th class="default-header-fields" *ngFor="let headerField of currentWorkbook.headerFields">
             {{ headerField.name }}
         </th>
     </tr>
-    <tr class="default-rows" *ngFor="let row of currentWorkbook.defaults.rows">
-        <td *ngFor="let headerField of currentWorkbook.defaults.headerFields">
+    <tr class="default-rows" *ngFor="let row of currentWorkbook.rows">
+        <td *ngFor="let headerField of currentWorkbook.headerFields">
            {{row[headerField.name]}}
         </td>
         <td>

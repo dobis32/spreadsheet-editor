@@ -91,6 +91,28 @@ describe('SheetListComponent', () => {
 		expect(component.workbookId).toBeTruthy();
 	});
 
+	it('should call function to get sheet data in constructor which calls the appropriate Firestore service function with workbook ID as the argument', async () => {
+		let fireStoreSpy = spyOn(
+			fixture.debugElement.injector.get(FirestoreService),
+			'getSheetCollection'
+		).and.callThrough();
+		fixture = TestBed.createComponent(SheetListComponent);
+		await fixture.whenStable();
+		expect(fireStoreSpy).toHaveBeenCalledTimes(1);
+		expect(fireStoreSpy).toHaveBeenCalledWith(component.workbookId);
+	});
+
+	it('should call function to get workbook data in constructor which calls the appropriate firestore service function with workbook ID as the argument', async () => {
+		let fireStoreSpy = spyOn(
+			fixture.debugElement.injector.get(FirestoreService),
+			'getWorkbookDocument'
+		).and.callThrough();
+		fixture = TestBed.createComponent(SheetListComponent);
+		await fixture.whenStable();
+		expect(fireStoreSpy).toHaveBeenCalledTimes(1);
+		expect(fireStoreSpy).toHaveBeenCalledWith(component.workbookId);
+	});
+
 	it('should have a function for getting sheet data of the workbook with the corresponding id from the firestore service', () => {
 		expect(component.getSheetData).toBeTruthy();
 		expect(typeof component.getSheetData).toEqual('function');
@@ -117,14 +139,13 @@ describe('SheetListComponent', () => {
 
 		expect(fsSpy).toHaveBeenCalledTimes(0);
 
-		component.getSheetData(''); // falsy value
+		component.getSheetData('');
 
 		expect(fsSpy).toHaveBeenCalledTimes(0);
 		expect(routerSpy).toHaveBeenCalledTimes(1);
 		expect(routerSpy).toHaveBeenCalledWith([ '/workbooks/list' ]);
 	});
 
-	// Get this P.O.S. working (corresponding mock service function is returning nothing????)
 	it('should have a function for getting the data of the current work book by calling the corresponding firestore service function with the current workbook ID as the arg', () => {
 		expect(component.getWorkbookData).toBeTruthy();
 		expect(typeof component.getWorkbookData).toEqual('function');

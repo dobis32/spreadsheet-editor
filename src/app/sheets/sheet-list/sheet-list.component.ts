@@ -65,9 +65,9 @@ export class SheetListComponent implements OnInit {
 		try {
 			this.invalidSheetForm = false;
 			if (!fg.valid) throw new Error('Invalid form');
-			if (!this.workbook || !this.workbook.defaults) throw new Error('Invalid workbook');
-			let headerFields = this.workbook.defaults.headerFields;
-			let rows = this.workbook.defaults.rows;
+			if (!this.workbook) throw new Error('Invalid workbook');
+			let headerFields = this.workbook.headerFields;
+			let rows = this.workbook.rows;
 			let data = {
 				uid: this.workbook.uid,
 				name: fg.value.name,
@@ -96,7 +96,7 @@ export class SheetListComponent implements OnInit {
 	editSheet(workbookId: string, sheetId: string) {
 		try {
 			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
-			this.router.navigate([ 'workbooks', workbookId, 'sheets', sheetId ]);
+			this.router.navigate([ 'workbooks', workbookId, 'sheets', sheetId, 'edit' ]);
 		} catch (error) {
 			console.log(error);
 		}
