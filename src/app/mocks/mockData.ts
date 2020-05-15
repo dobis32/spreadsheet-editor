@@ -54,12 +54,23 @@ export class MockWorkBookFactory {
 	}
 
 	getWorkBookDocument(n?: number) {
-		let workbook: any = { ...this.mockWorkbookDocument, rows: new Array<any>(), headerFields: new Array<any>() };
-		workbook.rows = this.getNRows(3);
-		this.mockHeaderFields.forEach((headerField) => {
-			workbook.headerFields.push({ ...headerField });
-		});
+		let workbook: any = {
+			...this.mockWorkbookDocument,
+			rows: this.getNRows(3),
+			headerFields: this.copyHeaderFields()
+		};
+
 		return workbook;
+	}
+
+	copyHeaderFields() {
+		let copiedFields = [];
+		this.mockHeaderFields.forEach((mockField) => {
+			let fieldCopy = {};
+			Object.assign(fieldCopy, mockField);
+			copiedFields.push(fieldCopy);
+		});
+		return copiedFields;
 	}
 }
 
@@ -72,71 +83,56 @@ export class MockSheetFactory {
 		name: 'name'
 	};
 
-	private mockRows = [
-		{
-			field1: 'some_value',
-			field2: 3000.001
-		},
-		{
-			field1: 'some_other_value',
-			field2: 123
-		}
-	];
-
 	private mockHeaderFields = [
 		{
-			name: 'field1',
+			name: 'a_field1',
 			text: true,
-			value: 'some_value'
+			value: 'some_value',
+			primary: true
 		},
 		{
-			name: 'field2',
+			name: 'b_field2',
 			text: false,
-			value: 300.001
+			value: 300.001,
+			primary: false
+		},
+		{
+			name: 'c_field3',
+			text: true,
+			value: 'some_other_value',
+			primary: false
 		}
 	];
 
-	getSheetDocument(n?: number) {
-		let sheet: any = {};
-		sheet = { ...this.mockSheetDocument, rows: new Array<any>(), headerFields: new Array<any>() };
-		this.mockRows.forEach((row) => {
-			sheet.rows.push({ ...row });
-		});
+	private makeRow() {
+		let row = {};
 		this.mockHeaderFields.forEach((headerField) => {
-			sheet.headerFields.push({ ...headerField });
+			row[headerField.name] = headerField.value;
 		});
+		return row;
+	}
+
+	getNRows(n: number) {
+		let rows = [];
+		for (let i = 0; i < n; i++) {
+			let row = this.makeRow();
+			rows.push(row);
+		}
+		return rows;
+	}
+
+	getSheetDocument(n?: number) {
+		let sheet = { ...this.mockSheetDocument, rows: this.getNRows(3), headerFields: this.copyHeaderFields() };
 		return sheet;
 	}
 
-	getWorkbookCollection;
+	copyHeaderFields() {
+		let copiedFields = [];
+		this.mockHeaderFields.forEach((mockField) => {
+			let fieldCopy = {};
+			Object.assign(fieldCopy, mockField);
+			copiedFields.push(fieldCopy);
+		});
+		return copiedFields;
+	}
 }
-
-// export let mockWorkbookDocument = {
-// 	id: 'id',
-// 	uid: 'uid',
-// 	name: 'name',
-// 	defaults: {
-// 		headerFields: [
-// 			{
-// 				name: 'field1',
-// 				text: true,
-// 				value: 'some_value'
-// 			},
-// 			{
-// 				name: 'field2',
-// 				text: false,
-// 				value: 300.001
-// 			}
-// 		],
-// 		rows: [
-// 			{
-// 				field1: 'some_value',
-// 				field2: 3000.001
-// 			},
-// 			{
-// 				field1: 'some_other_value',
-// 				field2: 123
-// 			}
-// 		]
-// 	}
-// };

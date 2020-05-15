@@ -1,0 +1,12 @@
+<h1>Sheet Viewer</h1>
+<hr>
+<table>
+    <tr>
+        <th *ngFor="let headerField of currentSheet.headerFields">{{ headerField.name }}</th>
+    </tr>
+    <tr *ngFor="let row of currentSheet.rows">
+        <td *ngFor="let headerField of currentSheet.headerFields">{{ row[headerField.name] }}</td>
+    </tr>
+</table>
+<hr>
+<button (click)="signOut()">sign out</button> temporary 

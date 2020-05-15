@@ -109,7 +109,7 @@ export class SheetEditorComponent implements OnInit {
 	}
 
 	openEditFieldModal(headerField?: any) {
-		let headerFieldToEdit = headerField ? headerField : { name: '', text: true, value: '' };
+		let headerFieldToEdit = headerField ? headerField : { name: '', text: true, value: '', primary: false };
 		const modalRef = this.modalService.open(EditHeaderFieldComponent);
 		modalRef.componentInstance.fieldToEdit = headerFieldToEdit;
 		modalRef.componentInstance.workbookId = this.workbookId;

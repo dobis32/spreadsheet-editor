@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SheetListComponent } from './sheet-list.component';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of, Observable } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder } from '@angular/forms';
@@ -42,10 +42,17 @@ class MockFirestoreService {
 		}
 	}
 }
+
 class MockActivatedRoute {
 	public params: Observable<any>;
 	constructor() {
 		this.params = of({ workbookId: 'workbook_id' });
+	}
+}
+
+class MockRouter {
+	navigate(id: string) {
+		return;
 	}
 }
 
@@ -60,6 +67,7 @@ describe('SheetListComponent', () => {
 				declarations: [ SheetListComponent ],
 				providers: [
 					FormBuilder,
+					{ provide: Router, useClass: MockRouter },
 					{ provide: FirestoreService, useClass: MockFirestoreService },
 					{ provide: ActivatedRoute, useClass: MockActivatedRoute }
 				]
@@ -85,6 +93,11 @@ describe('SheetListComponent', () => {
 	it('should have an Activated Route injected into it', () => {
 		expect(component.activatedRoute).toBeTruthy();
 		expect(fixture.debugElement.injector.get(ActivatedRoute));
+	});
+
+	it('should have an Router injected into it', () => {
+		expect(component.router).toBeTruthy();
+		expect(fixture.debugElement.injector.get(Router));
 	});
 
 	it('should have the current workbook ID', () => {
@@ -169,5 +182,35 @@ describe('SheetListComponent', () => {
 
 		component.addSheet(component.sheetForm);
 		expect(fsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a function to navigate to the sheet editor', () => {
+		const workbookId = 'book_id';
+		const sheetId = 'sheet_id';
+		const routerSpy = spyOn(component.router, 'navigate').and.callThrough();
+
+		expect(component.editSheet).toBeTruthy();
+		expect(typeof component.editSheet).toEqual('function');
+		expect(routerSpy).toHaveBeenCalledTimes(0);
+
+		component.editSheet(workbookId, sheetId);
+
+		expect(routerSpy).toHaveBeenCalledTimes(1);
+		expect(routerSpy).toHaveBeenCalledWith([ 'workbooks', workbookId, 'sheets', sheetId, 'edit' ]);
+	});
+
+	it('should have a function to navigate to the sheet viewer', () => {
+		const workbookId = 'book_id';
+		const sheetId = 'sheet_id';
+		const routerSpy = spyOn(component.router, 'navigate').and.callThrough();
+
+		expect(component.viewSheet).toBeTruthy();
+		expect(typeof component.viewSheet).toEqual('function');
+		expect(routerSpy).toHaveBeenCalledTimes(0);
+
+		component.viewSheet(workbookId, sheetId);
+
+		expect(routerSpy).toHaveBeenCalledTimes(1);
+		expect(routerSpy).toHaveBeenCalledWith([ 'workbooks', workbookId, 'sheets', sheetId, 'view' ]);
 	});
 });

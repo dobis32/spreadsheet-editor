@@ -44,7 +44,7 @@ export class SheetListComponent implements OnInit {
 					this.getSheetData(this.workbookId);
 					this.getWorkbookData(this.workbookId);
 				} else {
-					this.router.navigate([ '/login' ]);
+					this.router.navigate([ 'login' ]);
 				}
 			});
 		}
@@ -113,6 +113,15 @@ export class SheetListComponent implements OnInit {
 		try {
 			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
 			this.router.navigate([ 'workbooks', workbookId, 'sheets', sheetId, 'edit' ]);
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+	viewSheet(workbookId: string, sheetId: string) {
+		try {
+			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
+			this.router.navigate([ 'workbooks', workbookId, 'sheets', sheetId, 'view' ]);
 		} catch (error) {
 			console.log(error);
 		}

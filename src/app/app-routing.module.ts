@@ -5,6 +5,7 @@ import { WorkbookEditorComponent } from './workbooks/workbook-editor/workbook-ed
 import { LoginComponent } from './login/login.component';
 import { SheetListComponent } from './sheets/sheet-list/sheet-list.component';
 import { SheetEditorComponent } from './sheets/sheet-editor/sheet-editor.component';
+import { SheetViewerComponent } from './sheets/sheet-viewer/sheet-viewer.component';
 
 export const routes: Routes = [
 	{
@@ -26,6 +27,10 @@ export const routes: Routes = [
 	{
 		path: 'workbooks/:workbookId/sheets/:sheetId/edit',
 		component: SheetEditorComponent
+	},
+	{
+		path: 'workbooks/:workbookId/sheets/:sheetId/view',
+		component: SheetViewerComponent
 	},
 	{ path: '**', component: LoginComponent }
 ];
