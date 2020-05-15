@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, isDevMode } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,6 +22,12 @@ export class SheetEditorComponent implements OnInit {
 	public signInAuth: Subscription;
 	public nameUpdateSuccess: boolean;
 	public nameUpdateFailure: boolean;
+	public paramSub: Subscription;
+	public sheetDocSub: Subscription;
+	public sort = function(a: string, b: string, isAsc: boolean) {
+		return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+	};
+
 	constructor(
 		public firestoreService: FirestoreService,
 		public activatedRoute: ActivatedRoute,
@@ -33,23 +39,53 @@ export class SheetEditorComponent implements OnInit {
 		this.nameUpdateFailure = false;
 		this.nameUpdateSuccess = false;
 		this.nameForm = this.formBuilder.group({ name: new FormControl('', Validators.required) });
-		this.signInAuth = this.firestoreService.signedIn.subscribe(async (user) => {
-			if (user) {
-				this.activatedRoute.params.subscribe((params) => {
-					this.sheetId = params['sheetId'];
-					this.workbookId = params['workbookId'];
-				});
-				this.firestoreService.getSheetDocument(this.workbookId, this.sheetId).subscribe((sheetData: any) => {
-					this.currentSheet = sheetData;
-					this.nameForm.setValue({ name: sheetData.name });
-				});
-			} else {
-				this.router.navigate([ '/login' ]);
-			}
-		});
+		if (isDevMode()) this.initData();
+		else {
+			this.signInAuth = this.firestoreService.signedIn.subscribe(async (user) => {
+				if (user) {
+					this.initData();
+				} else {
+					this.router.navigate([ '/login' ]);
+				}
+			});
+		}
 	}
 
 	ngOnInit(): void {}
+
+	ngOnDestroy(): void {
+		if (this.paramSub) this.paramSub.unsubscribe();
+		if (this.sheetDocSub) this.sheetDocSub.unsubscribe();
+		if (this.signInAuth) this.signInAuth.unsubscribe();
+	}
+
+	sortHeaderFields(headerFields: Array<any>) {
+		let sortedFields = [];
+		let fieldsToSort = [];
+		headerFields.forEach((field) => {
+			if (field.primary) sortedFields.push(field);
+			else fieldsToSort.push(field);
+		});
+		fieldsToSort = fieldsToSort.sort((a, b) => {
+			return this.sort(a.name, b.name, true);
+		});
+		sortedFields = [ ...sortedFields, ...fieldsToSort ];
+		return sortedFields;
+	}
+
+	initData() {
+		this.paramSub = this.activatedRoute.params.subscribe((params) => {
+			this.sheetId = params['sheetId'];
+			this.workbookId = params['workbookId'];
+		});
+		this.sheetDocSub = this.firestoreService
+			.getSheetDocument(this.workbookId, this.sheetId)
+			.subscribe((sheetData: any) => {
+				this.currentSheet = sheetData;
+				this.currentSheet.headerFields = this.sortHeaderFields(this.currentSheet.headerFields);
+				this.nameForm.setValue({ name: sheetData.name });
+			});
+	}
 
 	clearUpdateMessages() {
 		this.invalidNameForm = false;

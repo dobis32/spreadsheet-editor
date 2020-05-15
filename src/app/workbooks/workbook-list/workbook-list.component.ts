@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, OnInit, isDevMode } from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +14,9 @@ export class WorkbookListComponent implements OnInit {
 	public workbooks: Array<any>;
 	public workbookForm: FormGroup;
 	public signedInAuth: Subscription;
+	public addWorkbookFailure: boolean;
+	public workbookSub: Subscription;
+	public uid: string;
 	constructor(
 		public formBuilder: FormBuilder,
 		public firestoreService: FirestoreService,
@@ -21,29 +24,45 @@ export class WorkbookListComponent implements OnInit {
 		public router: Router
 	) {
 		this.workbooks = new Array<any>();
-		this.signedInAuth = this.firestoreService.signedIn.subscribe((user) => {
-			if (user) {
-				this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
-					this.workbooks = workbooksData;
-				});
-			} else {
-				this.router.navigate([ '/login' ]);
-			}
-		});
-		this.workbookForm = this.formBuilder.group({ name: '' });
+		this.addWorkbookFailure = false;
+		this.workbookForm = this.formBuilder.group({ name: new FormControl('', [ Validators.required ]) });
+		if (isDevMode()) {
+			this.uid = 'test_uid';
+			this.workbookSub = this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
+				this.workbooks = workbooksData;
+			});
+		} else {
+			this.signedInAuth = this.firestoreService.signedIn.subscribe((user) => {
+				if (user) {
+					this.uid = user.uid;
+					this.workbookSub = this.firestoreService.getWorkbookCollection().subscribe((workbooksData) => {
+						this.workbooks = workbooksData;
+					});
+				} else {
+					this.router.navigate([ '/login' ]);
+				}
+			});
+		}
 	}
 
 	ngOnInit(): void {}
 
+	ngOnDestroy(): void {
+		if (this.signedInAuth) this.signedInAuth.unsubscribe();
+		if (this.workbookSub) this.workbookSub.unsubscribe();
+	}
+
 	async addWorkbook(fg: FormGroup) {
 		try {
+			this.addWorkbookFailure = false;
 			if (!fg.value.name) throw new Error('Invalid workbook name');
-			const workbook = { name: fg.value.name };
+			const workbook = { name: fg.value.name, uid: this.uid, headerFields: [], rows: [] };
 			let result = await this.firestoreService.addWorkbook(workbook);
-			if (result) console.log('result of book add is truthy');
+			if (!result) throw new Error('Failed to add workbook');
 			fg.reset();
 		} catch (error) {
 			console.log(error);
+			this.addWorkbookFailure = true;
 		}
 	}
 

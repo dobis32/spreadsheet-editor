@@ -6,7 +6,7 @@ import { FirestoreService } from 'src/app/services/firestore.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Observable, of } from 'rxjs';
-import { MockSheetFactory } from '../../../assets/mockData';
+import { MockSheetFactory } from '../../mocks/mockData';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EditHeaderFieldComponent } from 'src/app/modals/edit-header-field/edit-header-field.component';
 import { EditRowComponent } from 'src/app/modals/edit-row/edit-row.component';
@@ -46,7 +46,11 @@ class MockActivatedRoute {
 		this.params = of({ workbookId: 'workbook_id', sheetId: 'sheet_id' });
 	}
 }
-class MockRouter {}
+class MockRouter {
+	navigate(params: any) {
+		return;
+	}
+}
 
 class MockNgbModal {
 	open(modal: any) {

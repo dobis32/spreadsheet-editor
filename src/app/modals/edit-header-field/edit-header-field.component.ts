@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
 
 @Component({
@@ -12,15 +12,20 @@ export class EditHeaderFieldComponent implements OnInit {
 	@Input() fieldToEdit: any;
 	@Input() workbookId: string;
 	@Input() sheetId: string;
-	// @Input() workbook: any;
 	@Input() data: any;
 	@Input() fs: FirestoreService;
 	public updateFailure: boolean;
 	public updateSuccess: boolean;
 	public headerFieldForm: FormGroup;
 	public initialField: any;
+
 	constructor(public activeModal: NgbActiveModal, public formBuilder: FormBuilder) {
-		this.headerFieldForm = this.formBuilder.group({ name: '', text: false, value: '' });
+		this.headerFieldForm = this.formBuilder.group({
+			name: new FormControl('', [ Validators.required ]),
+			text: false,
+			value: new FormControl('', [ Validators.required ]),
+			primary: false
+		});
 		this.updateFailure = false;
 		this.updateSuccess = false;
 		this.initialField = {};
@@ -32,17 +37,48 @@ export class EditHeaderFieldComponent implements OnInit {
 	}
 
 	async save(fg: FormGroup) {
-		this.clearUpdateMessages();
-		this.fieldToEdit = this.setFieldToEditValues(this.fieldToEdit, fg.value);
-		if (!this.data.headerFields.some((field) => field == this.fieldToEdit)) {
-			this.data.headerFields.push(this.fieldToEdit);
+		try {
+			if (!fg.valid) throw new Error('Invalid data');
+			this.clearUpdateMessages();
+			this.fieldToEdit = this.setFieldToEditValues(this.fieldToEdit, fg.value);
+			this.data.headerFields = this.updatePrimaryField(this.fieldToEdit, this.data.headerFields);
+			if (this.isNewHeaderField(this.fieldToEdit, this.data.headerFields)) {
+				this.data.headerFields.push(this.fieldToEdit);
+			}
+			this.data.rows = this.updateRows(this.fieldToEdit, this.data.rows, this.initialField);
+			let result;
+			if (this.sheetId) result = this.fs.updateSheet(this.workbookId, this.sheetId, this.data);
+			else result = this.fs.updateWorkbook(this.workbookId, this.data);
+			if (result) this.updateSuccess = true;
+			else throw new Error('Update failed');
+		} catch (error) {
+			console.log(error);
+			this.updateFailure = true;
 		}
-		this.data.rows = this.updateRows(this.fieldToEdit, this.data.rows, this.initialField);
-		let result;
-		if (this.sheetId) result = this.fs.updateSheet(this.workbookId, this.sheetId, this.data);
-		else result = this.fs.updateWorkbook(this.workbookId, this.data);
-		if (result) this.updateSuccess = true;
-		else this.updateFailure = true;
+	}
+
+	isNewHeaderField(incomingField: any, headerFields: Array<any>) {
+		return !headerFields.some((field) => field == incomingField);
+	}
+
+	updatePrimaryField(updatedField: any, headerFields: Array<any>) {
+		let updatedFields;
+		if (updatedField.primary) {
+			updatedFields = [];
+			// if the updated field is primary, set all other fields to not be primary
+			headerFields.forEach((headerField) => {
+				if (headerField != updatedField) {
+					headerField.primary = false;
+				}
+				updatedFields.push(headerField);
+			});
+		} else {
+			if (updatedField != headerFields[0]) headerFields[0].primary = true;
+			else headerFields[1].primary = true;
+			updatedFields = [ ...headerFields ];
+		}
+
+		return updatedFields;
 	}
 
 	clearUpdateMessages() {
@@ -65,6 +101,8 @@ export class EditHeaderFieldComponent implements OnInit {
 	}
 
 	updateRows(updatedField: any, rows: Array<any>, oldField: any) {
+		let updatedRows = [];
+
 		rows.forEach((row) => {
 			if (oldField.name == '') {
 				// new field
@@ -77,8 +115,9 @@ export class EditHeaderFieldComponent implements OnInit {
 			if (!updatedField.text) {
 				row[updatedField.name] = this.parseFieldValueToNumber(row, updatedField.name);
 			}
+			updatedRows.push(row);
 		});
-		return rows;
+		return updatedRows;
 	}
 
 	parseFieldValueToNumber(row: any, fieldName: string) {
@@ -86,19 +125,21 @@ export class EditHeaderFieldComponent implements OnInit {
 		return parsedValue ? parsedValue : 0;
 	}
 
-	getFiltered(headerFieldArray, headerFieldToDelete) {
+	getFiltered(headerFieldArray: Array<any>, headerFieldToDelete: any) {
 		return headerFieldArray.filter((headerfield: any) => headerfield != headerFieldToDelete);
 	}
 
 	async deleteHeaderField(headerFieldToDelete: any) {
 		this.clearUpdateMessages();
+		if (this.data.headerFields.length - 1) this.data.headerFields[1].primary = true;
 		this.data.headerFields = this.getFiltered(this.data.headerFields, headerFieldToDelete);
 		this.data.rows = this.deleteFromRows(this.data.rows, headerFieldToDelete.name);
 		let result;
 		if (this.sheetId) result = await this.fs.updateSheet(this.workbookId, this.sheetId, this.data);
 		else result = await this.fs.updateWorkbook(this.workbookId, this.data);
-		if (result) this.activeModal.close();
-		else this.updateFailure = true;
+		if (result) {
+			this.activeModal.close();
+		} else this.updateFailure = true;
 	}
 
 	deleteFromRows(rows: Array<any>, fieldToDelete) {

@@ -15,35 +15,47 @@ export class MockWorkBookFactory {
 		name: 'name'
 	};
 
-	private mockRows = [
+	private mockHeaderFields = [
 		{
-			field1: 'some_value',
-			field2: 3000.001
+			name: 'a_field1',
+			text: true,
+			value: 'some_value',
+			primary: true
 		},
 		{
-			field1: 'some_other_value',
-			field2: 123
+			name: 'b_field2',
+			text: false,
+			value: 300.001,
+			primary: false
+		},
+		{
+			name: 'c_field3',
+			text: true,
+			value: 'some_other_value',
+			primary: false
 		}
 	];
 
-	private mockHeaderFields = [
-		{
-			name: 'field1',
-			text: true,
-			value: 'some_value'
-		},
-		{
-			name: 'field2',
-			text: false,
-			value: 300.001
+	private makeRow() {
+		let row = {};
+		this.mockHeaderFields.forEach((headerField) => {
+			row[headerField.name] = headerField.value;
+		});
+		return row;
+	}
+
+	getNRows(n: number) {
+		let rows = [];
+		for (let i = 0; i < n; i++) {
+			let row = this.makeRow();
+			rows.push(row);
 		}
-	];
+		return rows;
+	}
 
 	getWorkBookDocument(n?: number) {
 		let workbook: any = { ...this.mockWorkbookDocument, rows: new Array<any>(), headerFields: new Array<any>() };
-		this.mockRows.forEach((row) => {
-			workbook.rows.push({ ...row });
-		});
+		workbook.rows = this.getNRows(3);
 		this.mockHeaderFields.forEach((headerField) => {
 			workbook.headerFields.push({ ...headerField });
 		});

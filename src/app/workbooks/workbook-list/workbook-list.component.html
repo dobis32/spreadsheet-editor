@@ -1,21 +1,22 @@
-<h1>Workbook List</h1>
+<h1 id="workbook-list-heading">Workbook List</h1>
 <hr>
 <h3>Workbooks</h3>
-<ul>
-    <li *ngFor="let workbook of workbooks">
+<ul id="workbooks-list">
+    <li *ngFor="let workbook of workbooks" class="workbook-listing">
         {{ workbook.name }} 
-        <button (click)="removeWorkbook(workbook.id)">Remove</button>
-        <button (click)="editWorkbook(workbook.id)">Edit</button>
-        <button (click)="viewWorkbook(workbook.id)">View</button>
+        <button class="remove-button" (click)="removeWorkbook(workbook.id)">Remove</button>
+        <button class="edit-button" (click)="editWorkbook(workbook.id)">Edit</button>
+        <button class="view-button" (click)="viewWorkbook(workbook.id)">View</button>
     </li>
 </ul>
 <hr>
 <h3>Add Workbook</h3>
 <h5>Workbook name:</h5>
-<form [formGroup]="workbookForm" (ngSubmit)="addWorkbook(workbookForm)">
+<form id="add-workbook-form" [formGroup]="workbookForm" (ngSubmit)="addWorkbook(workbookForm)">
     <label for="name">Name</label>
-    <input type="text" formControlName="name">
-    <button>Add</button>
+    <input id="name" type="text" formControlName="name">
+    <button id="add-workbook-button">Add</button>
 </form>
+<h3 *ngIf="addWorkbookFailure" class="error-message">Invalid workbook name.</h3>
 <button (click)="signOut()">sign out</button> temporary 
 <!-- <button (click)="signIn()">sign in</button> temporary -->

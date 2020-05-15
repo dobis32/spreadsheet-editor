@@ -4,11 +4,13 @@ import { EditRowComponent } from './edit-row.component';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FirestoreService } from 'src/app/services/firestore.service';
-import { MockWorkBookFactory } from 'src/assets/mockData';
+import { MockWorkBookFactory } from '../../mocks/mockData';
 import { By } from '@angular/platform-browser';
 
 class MockNgbActiveModal {
-	close() {}
+	close() {
+		return;
+	}
 }
 class MockFireStoreService {
 	async updateWorkbook(id: string, data: any) {

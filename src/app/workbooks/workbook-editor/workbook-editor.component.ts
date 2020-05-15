@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, isDevMode } from '@angular/core';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditHeaderFieldComponent } from '../../modals/edit-header-field/edit-header-field.component';
 import { EditRowComponent } from '../../modals/edit-row/edit-row.component';
@@ -21,6 +21,11 @@ export class WorkbookEditorComponent implements OnInit {
 	public invalidNameForm: boolean;
 	public nameUpdateFailure: boolean;
 	public nameUpdateSuccess: boolean;
+	public workbookSub: Subscription;
+	public paramSub: Subscription;
+	public sort = function(a: string, b: string, isAsc: boolean) {
+		return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+	};
 
 	constructor(
 		public formBuilder: FormBuilder,
@@ -32,26 +37,54 @@ export class WorkbookEditorComponent implements OnInit {
 		this.invalidNameForm = false;
 		this.nameUpdateFailure = false;
 		this.nameUpdateSuccess = false;
-		this.nameForm = this.formBuilder.group({ name: '' });
-		this.signInAuth = this.firestoreService.signedIn.subscribe(async (user) => {
-			if (user) {
-				this.activatedRoute.params.subscribe((params) => {
-					this.workbookId = params['id'];
-				});
-				this.firestoreService.getWorkbookDocument(this.workbookId).subscribe((workbookDoc: any) => {
-					this.currentWorkbook = workbookDoc;
-					console.log(this.currentWorkbook);
-					this.nameForm.setValue({ name: this.currentWorkbook.name });
-				});
-			} else {
-				this.router.navigate([ '/login' ]);
-			}
+		this.nameForm = this.formBuilder.group({
+			name: new FormControl('', [ Validators.required, Validators.minLength(1) ])
 		});
+		if (isDevMode()) this.initData();
+		else {
+			this.signInAuth = this.firestoreService.signedIn.subscribe(async (user) => {
+				if (user) {
+					this.initData();
+				} else {
+					this.router.navigate([ '/login' ]);
+				}
+			});
+		}
 	}
 
 	ngOnInit(): void {}
 
-	addRow() {}
+	ngOnDestroy(): void {
+		if (this.signInAuth) this.signInAuth.unsubscribe();
+		if (this.workbookSub) this.workbookSub.unsubscribe();
+		if (this.paramSub) this.paramSub.unsubscribe();
+	}
+
+	initData() {
+		this.paramSub = this.activatedRoute.params.subscribe((params) => {
+			this.workbookId = params['id'];
+		});
+		this.workbookSub = this.firestoreService.getWorkbookDocument(this.workbookId).subscribe((workbookDoc: any) => {
+			this.currentWorkbook = workbookDoc;
+			this.currentWorkbook.headerFields = this.sortHeaderFields(this.currentWorkbook.headerFields);
+			this.nameForm.setValue({ name: this.currentWorkbook.name });
+			console.log(this.currentWorkbook);
+		});
+	}
+
+	sortHeaderFields(headerFields: Array<any>) {
+		let sortedFields = [];
+		let fieldsToSort = [];
+		headerFields.forEach((field) => {
+			if (field.primary) sortedFields.push(field);
+			else fieldsToSort.push(field);
+		});
+		fieldsToSort = fieldsToSort.sort((a, b) => {
+			return this.sort(a.name, b.name, true);
+		});
+		sortedFields = [ ...sortedFields, ...fieldsToSort ];
+		return sortedFields;
+	}
 
 	clearUpdateMessages() {
 		this.invalidNameForm = false;
@@ -60,11 +93,11 @@ export class WorkbookEditorComponent implements OnInit {
 	}
 
 	openEditFieldModal(headerField?: any) {
-		let headerFieldToEdit = headerField ? headerField : { name: '', text: true, value: '' };
+		let headerFieldToEdit = headerField ? headerField : { name: '', text: true, value: '', primary: true };
+		if (!headerField && this.currentWorkbook.headerFields.length) headerFieldToEdit.primary = false;
 		const modalRef = this.modalService.open(EditHeaderFieldComponent);
 		modalRef.componentInstance.fieldToEdit = headerFieldToEdit;
 		modalRef.componentInstance.workbookId = this.workbookId;
-		// modalRef.componentInstance.workbook = this.currentWorkbook;
 		modalRef.componentInstance.data = this.currentWorkbook;
 		modalRef.componentInstance.fs = this.firestoreService;
 	}
@@ -74,8 +107,7 @@ export class WorkbookEditorComponent implements OnInit {
 		const modalRef = this.modalService.open(EditRowComponent);
 		modalRef.componentInstance.rowToEdit = rowToEdit;
 		modalRef.componentInstance.workbookId = this.workbookId;
-		modalRef.componentInstance.workbook = this.currentWorkbook;
-		// modalRef.componentInstance.data = this.currentWorkbook;
+		modalRef.componentInstance.data = this.currentWorkbook;
 		modalRef.componentInstance.fs = this.firestoreService;
 	}
 
@@ -87,13 +119,19 @@ export class WorkbookEditorComponent implements OnInit {
 		return row;
 	}
 
-	updateWorkbookName(fg: FormGroup) {
-		if (fg.value.name) {
+	async updateWorkbookName(fg: FormGroup) {
+		try {
+			this.clearUpdateMessages();
+			if (!fg.valid) throw new Error('Invlaid workbook name');
 			const data = { ...this.currentWorkbook };
-			const id = data.id;
-			delete data.id;
+			const id = this.workbookId;
 			data.name = fg.value.name;
-			this.firestoreService.updateWorkbook(id, data);
+			const result = await this.firestoreService.updateWorkbook(id, data);
+			if (result) this.nameUpdateSuccess = true;
+			else this.nameUpdateFailure = true;
+		} catch (error) {
+			console.log(error);
+			this.invalidNameForm = true;
 		}
 	}
 

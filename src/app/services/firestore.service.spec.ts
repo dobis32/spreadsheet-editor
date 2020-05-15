@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { FirestoreService } from './firestore.service';
 import { of } from 'rxjs';
-import { mockWorkbookCollection } from '../../assets/mockData';
+import { mockWorkbookCollection } from '../mocks/mockData';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { environment } from 'src/environments/environment';
@@ -100,7 +100,7 @@ describe('FirestoreService', () => {
 		expect(service.getWorkbookCollection).toBeTruthy();
 		expect(typeof service.getWorkbookCollection).toEqual('function');
 		expect(afsSpy).toHaveBeenCalled();
-		expect(afsSpy).toHaveBeenCalledWith('workbooks');
+		expect(afsSpy).toHaveBeenCalledWith('test_data/test/workbooks');
 	});
 
 	it('should have a function to add a workbook the workbooks collection of the firestore database', () => {
@@ -114,7 +114,7 @@ describe('FirestoreService', () => {
 		expect(service.getWorkbookCollection).toBeTruthy();
 		expect(typeof service.getWorkbookCollection).toEqual('function');
 		expect(afsSpy).toHaveBeenCalled();
-		expect(afsSpy).toHaveBeenCalledWith('workbooks');
+		expect(afsSpy).toHaveBeenCalledWith('test_data/test/workbooks');
 	});
 	it('should have AngularFireAuth injected into it', () => {
 		expect(service.afAuth).toBeTruthy();
@@ -185,7 +185,6 @@ describe('FirestoreService', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'add').and.callThrough();
 		let truthyWorkbookData = mockWorkbookCollection[0];
-		service.uid = 'someID';
 		expect(truthyWorkbookData).toBeTruthy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 		await service.addWorkbook(truthyWorkbookData);

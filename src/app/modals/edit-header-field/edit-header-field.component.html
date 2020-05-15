@@ -1,34 +1,38 @@
 <div class="modal-header">
-  <h4 class="modal-title">Edit Header Field</h4>
+  <h4 class="modal-title" id="edit-header-field-modal">Edit Header Field</h4>
   <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 <div class="modal-body">
-  <form class="ml-3" [formGroup]="headerFieldForm" (ngSubmit)="save(headerFieldForm)">
+  <form class="ml-3" id="header-field-form" [formGroup]="headerFieldForm" (ngSubmit)="save(headerFieldForm)">
 	  <div class="row mb-3">
 			<label class="mt-1" for="name">Name:</label>
-			<input class="ml-2" type="text" name="name" formControlName="name">
+			<input class="ml-2" id="name-input" type="text" name="name" formControlName="name">
 	  </div>
 		<div class="row mb-3">
-			<label class="mt-1" for="name">Text:</label>
+			<label class="mt-1" for="text">Text:</label>
 			<input class="ml-2 mt-2" type="checkbox" name="text" formControlName="text">
 		</div>
 		<div class="row mb-3">
-			<label class="mt-1" for="name">Default Value:</label>
-			<input class="ml-2" type="text" name="value" formControlName="value">
+			<label class="mt-1" for="value">Default Value:</label>
+			<input class="ml-2" id="value-input" type="text" name="value" formControlName="value">
 		</div>
 		<div class="row mb-3">
-			<button class="ml-3 mt-3">Save</button>
+			<label class="mt-1" for="primary">Primary Field:</label>
+			<input class="ml-2 mt-2" type="checkbox" name="primary" formControlName="primary">
+		</div>
+		<div class="row mb-3">
+			<button id="save-button" class="ml-3 mt-3">Save</button>
 		</div>
 		<div class="row">
-			<h4 *ngIf="updateFailure" class="error-message">Action failed. Try again.</h4>
+			<h4 *ngIf="updateFailure" class="error-message">Update failed. Try again.</h4>
 			<h4 *ngIf="updateSuccess" class="success-message">Updated successfully.</h4>
 		</div>
 	</form>
 </div>
 <div class="modal-footer">
 	<div class="row">
-		<button class="ml-3 mt-3" (click)="deleteHeaderField(fieldToEdit)">Delete</button>
+		<button id="delete-header-field-button" class="ml-3 mt-3" (click)="deleteHeaderField(fieldToEdit)">Delete</button>
 	</div>
 </div>

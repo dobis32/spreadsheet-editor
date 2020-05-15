@@ -3,11 +3,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditHeaderFieldComponent } from './edit-header-field.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder } from '@angular/forms';
-import { MockWorkBookFactory } from 'src/assets/mockData';
+import { MockWorkBookFactory } from '../../mocks/mockData';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { By } from '@angular/platform-browser';
 
-class MockNgbActiveModal {}
+class MockNgbActiveModal {
+	close() {
+		return;
+	}
+}
 class MockFireStoreService {
 	async updateWorkbook(id: string, data: any) {
 		try {
@@ -87,7 +91,7 @@ describe('EditHeaderFieldComponent', () => {
 	});
 
 	it('should have a function that updates the values of the field being edited corresponding to the values from the associated form group', () => {
-		let fgData = { name: 'new_name', text: true, value: 'some_new_value' };
+		let fgData = { name: 'new_name', text: true, value: 'some_new_value', primary: false };
 
 		component.headerFieldForm.setValue(fgData);
 
@@ -101,7 +105,7 @@ describe('EditHeaderFieldComponent', () => {
 	});
 
 	it('should have a function that parses appropriate values when updating the default value of a header field', () => {
-		let fgData = { name: 'new_name', text: false, value: '0' }; // note that the function will parse the value to a number, since 'text' is false
+		let fgData = { name: 'new_name', text: false, value: '0', primary: false }; // note that the function will parse the value to a number, since 'text' is false
 		component.headerFieldForm.setValue(fgData);
 
 		let result = component.setFieldToEditValues(mockWorkbook.headerFields[0], component.headerFieldForm.value);
@@ -109,15 +113,16 @@ describe('EditHeaderFieldComponent', () => {
 		expect(result.value).toEqual(parseFloat(component.headerFieldForm.value.value));
 		expect(typeof result.value != 'string').toBeTrue();
 
-		component.headerFieldForm.setValue({ name: 'new_name', text: true, value: 'some_new_value' });
+		component.headerFieldForm.setValue({ name: 'new_name', text: true, value: 'some_new_value', primary: false });
 		result = component.setFieldToEditValues(mockWorkbook.headerFields[0], component.headerFieldForm.value);
 
 		expect(result.value).toEqual(component.headerFieldForm.value.value);
 		expect(typeof result.value == 'string').toBeTrue();
 	});
 
+	// THIS SON OF A BITCH AINT RUNNING
 	it('should have a function that updates and returns the default row data corresponding to the meta data of an updated header field', () => {
-		let updatedField = { name: 'new_name', text: true, value: 'abc' };
+		let updatedField = { name: 'new_name', text: true, value: 'abc', primary: false };
 		let rows = mockWorkbook.rows;
 		let oldField = mockWorkbook.headerFields[1];
 
@@ -203,6 +208,41 @@ describe('EditHeaderFieldComponent', () => {
 		expect(result).toEqual(0);
 
 		result = component.parseFieldValueToNumber({ strField: '32' }, 'strField');
+
 		expect(result).toEqual(32);
+	});
+
+	it('should have a function returns true if a specific header field does not exist in an array of header fields and false if it does exist', () => {
+		expect(component.isNewHeaderField).toBeTruthy();
+		expect(typeof component.isNewHeaderField).toEqual('function');
+		expect(component.isNewHeaderField(component.data.headerFields[0], component.data.headerFields)).toBeFalse();
+		expect(component.isNewHeaderField({}, component.data.headerFields)).toBeTrue();
+	});
+
+	it('should have a function to ensure only one primary header field exists in an array of header fields at a time', () => {
+		expect(component.updatePrimaryField).toBeTruthy();
+		expect(typeof component.updatePrimaryField).toEqual('function');
+		let incomingField = component.data.headerFields[1];
+		incomingField.primary = true;
+		let result = component.updatePrimaryField(incomingField, component.data.headerFields);
+		let count = 0;
+		result.forEach((field) => {
+			if (field.primary) count++;
+		});
+		expect(count).toEqual(1);
+		component.data = mockWorkbookFactory.getWorkBookDocument();
+		incomingField = component.data.headerFields[0];
+		incomingField.primary = false;
+		count = 0;
+		component.data.headerFields.forEach((field) => {
+			if (field.primary) count++;
+		});
+		expect(count).toEqual(0);
+		result = component.updatePrimaryField(incomingField, component.data.headerFields);
+		count = 0;
+		result.forEach((field) => {
+			if (field.primary) count++;
+		});
+		expect(count).toEqual(1);
 	});
 });

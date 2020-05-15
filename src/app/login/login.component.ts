@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, isDevMode } from '@angular/core';
 import { FirestoreService } from '../services/firestore.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
@@ -20,18 +20,31 @@ export class LoginComponent implements OnInit {
 			password: new FormControl('', [ Validators.required ])
 		});
 		this.invalidCredentials = false;
-		this.signInAuth = this.firestoreService.signedIn.subscribe((user) => {
-			if (user) {
-				this.router.navigate([ '/workbooks/list' ]);
-			}
-		});
+
+		if (!isDevMode())
+			this.signInAuth = this.firestoreService.signedIn.subscribe((user) => {
+				if (user) {
+					this.router.navigate([ '/workbooks/list' ]);
+				}
+			});
 	}
 
 	ngOnInit(): void {}
 
-	signIn(fg: FormGroup) {
-		this.invalidCredentials = false;
-		if (fg.valid) this.firestoreService.signIn(fg.value.email, fg.value.password);
-		else this.invalidCredentials = true;
+	ngOnDestroy(): void {
+		if (this.signInAuth) this.signInAuth.unsubscribe();
+	}
+
+	async signIn(fg: FormGroup) {
+		try {
+			this.invalidCredentials = false;
+			if (!fg.valid) throw new Error('Invalid credentials');
+			const result = await this.firestoreService.signIn(fg.value.email, fg.value.password);
+			if (result) this.router.navigate([ 'workbooks', 'list' ]);
+			else throw new Error('Invalid credentials');
+		} catch (error) {
+			console.log(error);
+			this.invalidCredentials = true;
+		}
 	}
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, isDevMode } from '@angular/core';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -13,11 +13,13 @@ export class SheetListComponent implements OnInit {
 	public sheets: Array<any>;
 	public workbookId: string;
 	public workbook: any;
-	public sheetDataSub: Subscription;
 	public signedInAuth: Subscription;
 	public sheetForm: FormGroup;
 	public invalidSheetForm: boolean;
-
+	public paramSub: Subscription;
+	public workbookSub: Subscription;
+	public sheetSub: Subscription;
+	public uid: string;
 	constructor(
 		public firestoreService: FirestoreService,
 		public activatedRoute: ActivatedRoute,
@@ -28,24 +30,38 @@ export class SheetListComponent implements OnInit {
 			name: new FormControl('', [ Validators.required ])
 		});
 		this.sheets = new Array();
-		this.activatedRoute.params.subscribe((params) => {
+		this.paramSub = this.activatedRoute.params.subscribe((params) => {
 			this.workbookId = params['workbookId'];
 		});
-		this.signedInAuth = this.firestoreService.signedIn.subscribe((user) => {
-			if (user) {
-				this.getSheetData(this.workbookId);
-				this.getWorkbookData(this.workbookId);
-			} else {
-				this.router.navigate([ '/login' ]);
-			}
-		});
+		if (isDevMode()) {
+			this.uid = 'test_uid';
+			this.getSheetData(this.workbookId);
+			this.getWorkbookData(this.workbookId);
+		} else {
+			this.signedInAuth = this.firestoreService.signedIn.subscribe((user) => {
+				if (user) {
+					this.uid = user.uid;
+					this.getSheetData(this.workbookId);
+					this.getWorkbookData(this.workbookId);
+				} else {
+					this.router.navigate([ '/login' ]);
+				}
+			});
+		}
 	}
 
 	ngOnInit(): void {}
 
+	ngOnDestory(): void {
+		if (this.signedInAuth) this.signedInAuth.unsubscribe();
+		if (this.paramSub) this.paramSub.unsubscribe();
+		if (this.workbookSub) this.workbookSub.unsubscribe();
+		if (this.sheetSub) this.sheetSub.unsubscribe();
+	}
+
 	getWorkbookData(workbookId: string) {
 		if (workbookId)
-			this.firestoreService.getWorkbookDocument(this.workbookId).subscribe((workbookData) => {
+			this.workbookSub = this.firestoreService.getWorkbookDocument(this.workbookId).subscribe((workbookData) => {
 				this.workbook = workbookData;
 				console.log('workbook', this.workbook);
 			});
@@ -54,7 +70,7 @@ export class SheetListComponent implements OnInit {
 
 	getSheetData(workbookId: string) {
 		if (workbookId)
-			this.firestoreService.getSheetCollection(workbookId).subscribe((sheetData) => {
+			this.sheetSub = this.firestoreService.getSheetCollection(workbookId).subscribe((sheetData) => {
 				if (sheetData) this.sheets = sheetData;
 				else this.sheets = new Array();
 			});
@@ -69,7 +85,7 @@ export class SheetListComponent implements OnInit {
 			let headerFields = this.workbook.headerFields;
 			let rows = this.workbook.rows;
 			let data = {
-				uid: this.workbook.uid,
+				uid: this.uid,
 				name: fg.value.name,
 				headerFields: Array.isArray(headerFields) ? headerFields : [],
 				rows: Array.isArray(rows) ? rows : []

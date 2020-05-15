@@ -3,11 +3,10 @@ import { WorkbookListComponent } from './workbook-list.component';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { of, Observable } from 'rxjs';
-import { mockWorkbookCollection } from '../../../assets/mockData';
+import { mockWorkbookCollection, MockWorkBookFactory } from '../../mocks/mockData';
 import { RouterTestingModule } from '@angular/router/testing';
 import { routes } from '../../app-routing.module';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MockWorkBookFactory } from 'src/assets/mockData';
 
 class MockFirestoreService {
 	public signedIn: Observable<any>;

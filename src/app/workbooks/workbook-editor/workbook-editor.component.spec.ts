@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { WorkbookEditorComponent } from './workbook-editor.component';
 import { FirestoreService } from 'src/app/services/firestore.service';
 import { Observable, of } from 'rxjs';
-import { MockWorkBookFactory } from 'src/assets/mockData';
+import { MockWorkBookFactory } from 'src/app/mocks/mockData';
 import { RouterTestingModule } from '@angular/router/testing';
 import { routes } from '../../app-routing.module';
 import { ActivatedRoute } from '@angular/router';
@@ -49,6 +49,10 @@ class MockNgbModal {
 	constructor() {}
 	open(data: any) {
 		return <NgbModalRef>{ componentInstance: {} };
+	}
+
+	close() {
+		return;
 	}
 }
 
@@ -126,15 +130,15 @@ describe('WorkbookEditorComponent', () => {
 	});
 
 	it('should have an function for updating the name of the current workbook that calls the appropriate firestore service function when the associated formgroup has a truthy name value', async () => {
-		component.nameForm.value.name = 'some_value';
+		component.nameForm.setValue({ name: 'some_value' });
 		let firestoreSpy = spyOn(
 			fixture.debugElement.injector.get(FirestoreService),
 			'updateWorkbook'
 		).and.callThrough();
-		component.updateWorkbookName(component.nameForm);
+		await component.updateWorkbookName(component.nameForm);
 		expect(firestoreSpy).toHaveBeenCalledTimes(1);
-		component.nameForm.value.name = '';
-		component.updateWorkbookName(component.nameForm);
+		component.nameForm.setValue({ name: '' });
+		await component.updateWorkbookName(component.nameForm);
 		expect(firestoreSpy).toHaveBeenCalledTimes(1);
 	});
 
@@ -170,5 +174,13 @@ describe('WorkbookEditorComponent', () => {
 		component.clearUpdateMessages();
 
 		expect(component.invalidNameForm || component.nameUpdateSuccess || component.nameUpdateFailure).toBeFalse();
+	});
+
+	it('should have a function for sorting header fields alphabetically, but leaving the primary field at index 0', () => {
+		component.currentWorkbook.headerFields[0].primary = false;
+		component.currentWorkbook.headerFields[1].primary = true;
+		let result = component.sortHeaderFields(component.currentWorkbook.headerFields);
+		expect(result[0].primary).toBeTrue();
+		expect(result[1].name).toBeLessThan(result[2].name);
 	});
 });

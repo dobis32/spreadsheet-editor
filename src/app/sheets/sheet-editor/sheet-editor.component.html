@@ -9,7 +9,7 @@
     <h3 class="success-message" *ngIf="nameUpdateSuccess">Name updated successfully.</h3>
 </form>
 <h3>Header Fields:</h3>
-<button (click)="openEditFieldModal()">Add</button>
+<button id="add-header-field-button" (click)="openEditFieldModal()">Add</button>
 <ul *ngIf="currentSheet">
     <li *ngFor="let headerField of currentSheet.headerFields">
         {{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}

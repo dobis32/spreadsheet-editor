@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { of, Observable } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder } from '@angular/forms';
-import { MockWorkBookFactory } from 'src/assets/mockData';
+import { MockWorkBookFactory } from '../../mocks/mockData';
 
 class MockFirestoreService {
 	public signedIn: Observable<any>;
