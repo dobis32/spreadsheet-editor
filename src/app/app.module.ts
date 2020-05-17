@@ -35,7 +35,6 @@ import { SheetViewerComponent } from './sheets/sheet-viewer/sheet-viewer.compone
 		ReactiveFormsModule,
 		AngularFireModule.initializeApp(environment.firebase),
 		NgbModule
-		// NgbModule
 		// AngularFirestoreModule.enablePersistence()
 	],
 	providers: [],
