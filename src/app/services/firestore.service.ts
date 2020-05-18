@@ -47,7 +47,7 @@ export class FirestoreService {
 		}
 	}
 
-	async removeWorkbook(id: string) {
+	async deleteWorkbook(id: string) {
 		try {
 			if (!id) throw new Error('Invalid workbook ID');
 			if (isDevMode()) await this.firestore.collection('test_data/test/workbooks').doc(id).delete();
@@ -148,7 +148,7 @@ export class FirestoreService {
 		}
 	}
 
-	async removeSheet(workbookId: string, sheetId: string) {
+	async deleteSheet(workbookId: string, sheetId: string) {
 		try {
 			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
 			if (isDevMode())

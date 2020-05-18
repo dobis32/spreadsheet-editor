@@ -59,6 +59,12 @@ export class EditRowComponent implements OnInit {
 		this.updateFailure = false;
 	}
 
+	confirmDelete(rowToDelete: any) {
+		if (confirm('Are you should you want to do delete this row?')) {
+			this.deleteRow(rowToDelete);
+		}
+	}
+
 	async deleteRow(rowToDelete: any) {
 		this.clearUpdateMessages();
 		this.data.rows = this.getFiltered(this.data.rows, rowToDelete);

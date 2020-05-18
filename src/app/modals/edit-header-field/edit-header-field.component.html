@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h4 class="modal-title" id="edit-header-field-modal">Edit Header Field</h4>
-  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+  <button type="button" class="close " aria-label="Close" (click)="activeModal.dismiss('Cross click')">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -23,7 +23,7 @@
 			<input class="ml-2 mt-2" type="checkbox" name="primary" formControlName="primary">
 		</div>
 		<div class="row mb-3">
-			<button id="save-button" class="ml-3 mt-3">Save</button>
+			<button id="save-button" class="ml-3 mt-3 btn btn-primary">Save</button>
 		</div>
 		<div class="row">
 			<h4 *ngIf="updateFailure" class="error-message">Update failed. Try again.</h4>
@@ -33,6 +33,6 @@
 </div>
 <div class="modal-footer">
 	<div class="row">
-		<button id="delete-header-field-button" class="ml-3 mt-3" (click)="deleteHeaderField(fieldToEdit)">Delete</button>
+		<button id="delete-header-field-button" class="ml-3 mt-3 btn btn-outline-danger" (click)="confirmDelete(fieldToEdit)">Delete</button>
 	</div>
 </div>

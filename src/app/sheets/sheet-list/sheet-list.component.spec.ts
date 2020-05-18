@@ -41,6 +41,15 @@ class MockFirestoreService {
 			return false;
 		}
 	}
+
+	public deleteSheet(workbookId: string, sheetId: string) {
+		try {
+			if (!workbookId || !sheetId) throw new Error();
+			else return true;
+		} catch (error) {
+			return false;
+		}
+	}
 }
 
 class MockActivatedRoute {
@@ -212,5 +221,25 @@ describe('SheetListComponent', () => {
 
 		expect(routerSpy).toHaveBeenCalledTimes(1);
 		expect(routerSpy).toHaveBeenCalledWith([ 'workbooks', workbookId, 'sheets', sheetId, 'view' ]);
+	});
+
+	it('should have a function to delete a sheet that calls the appropriate FirestoreService function when truthy ID args are passed', async () => {
+		let workbookId = 'someID';
+		let sheetId = 'someID';
+		let afsSpy = spyOn(TestBed.get(FirestoreService), 'deleteSheet').and.callThrough();
+		expect(workbookId && sheetId).toBeTruthy();
+		expect(afsSpy).toHaveBeenCalledTimes(0);
+		await component.deleteSheet(workbookId, sheetId);
+		expect(afsSpy).toHaveBeenCalledTimes(1);
+	});
+
+	it('should have a function to delete a workbook that does not call the appropriate FirestoreService function when falsy ID args are passed', async () => {
+		let workbookId = '';
+		let sheetId = '';
+		let afsSpy = spyOn(TestBed.get(FirestoreService), 'deleteSheet').and.callThrough();
+		expect(workbookId && sheetId).toBeFalsy();
+		expect(afsSpy).toHaveBeenCalledTimes(0);
+		await component.deleteSheet(workbookId, sheetId);
+		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 });

@@ -9,7 +9,7 @@
                         <h5 class="mr-auto mt-2">{{ workbook.name }}</h5>
                         <button class="btn btn-primary view-button ml-2" (click)="viewWorkbook(workbook.id)">View</button>
                         <button class="btn btn-outline-primary edit-button ml-2" (click)="editWorkbook(workbook.id)">Edit</button>
-                        <button class="btn btn-outline-danger remove-button ml-2" (click)="removeWorkbook(workbook.id)">Remove</button>
+                        <button class="btn btn-outline-danger delete-button ml-2" (click)="confirmDelete(workbook.id)">Delete</button>
                     </div>
                 </li>
             </ul>

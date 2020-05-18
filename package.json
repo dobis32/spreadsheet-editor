@@ -26,9 +26,11 @@
 		"@firebase/firestore": "^1.14.2",
 		"@ng-bootstrap/ng-bootstrap": "^6.1.0",
 		"bootstrap": "^4.4.0",
+		"file-saver": "^2.0.2",
 		"firebase": "^7.14.2",
 		"rxjs": "~6.5.4",
 		"tslib": "^1.10.0",
+		"xlsx": "^0.16.1",
 		"zone.js": "~0.10.2"
 	},
 	"devDependencies": {

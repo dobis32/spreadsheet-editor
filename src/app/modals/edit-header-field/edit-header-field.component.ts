@@ -129,6 +129,12 @@ export class EditHeaderFieldComponent implements OnInit {
 		return headerFieldArray.filter((headerfield: any) => headerfield != headerFieldToDelete);
 	}
 
+	confirmDelete(headerFieldToDelete: any) {
+		if (confirm('Are you sure you want to delete this row?')) {
+			this.deleteHeaderField(headerFieldToDelete);
+		}
+	}
+
 	async deleteHeaderField(headerFieldToDelete: any) {
 		this.clearUpdateMessages();
 		if (this.data.headerFields.length - 1) this.data.headerFields[1].primary = true;

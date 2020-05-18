@@ -66,10 +66,16 @@ export class WorkbookListComponent implements OnInit {
 		}
 	}
 
-	async removeWorkbook(id: string) {
+	confirmDelete(id: string) {
+		if (confirm('Are you sure you want to delete this workbook?')) {
+			this.deleteWorkbook(id);
+		}
+	}
+
+	async deleteWorkbook(id: string) {
 		try {
 			if (!id) throw new Error('Invalid ID');
-			const result = await this.firestoreService.removeWorkbook(id);
+			const result = await this.firestoreService.deleteWorkbook(id);
 			if (!result) throw new Error('Failed to remove workbook');
 		} catch (error) {
 			console.log(error);

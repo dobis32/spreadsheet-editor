@@ -98,11 +98,17 @@ export class SheetListComponent implements OnInit {
 		}
 	}
 
-	async removeSheet(workbookId: string, sheetId: string) {
+	confirmDelete(workbookId: string, sheetId: string) {
+		if (confirm('Are you sure you want to delete this sheet?')) {
+			this.deleteSheet(workbookId, sheetId);
+		}
+	}
+
+	async deleteSheet(workbookId: string, sheetId: string) {
 		console.log(workbookId, sheetId);
 		try {
 			if (!workbookId || !sheetId) throw new Error('Invalid workbook ID or sheet ID');
-			const result = await this.firestoreService.removeSheet(workbookId, sheetId);
+			const result = await this.firestoreService.deleteSheet(workbookId, sheetId);
 			if (!result) throw new Error('Could not remove sheet');
 		} catch (error) {
 			console.log(error);

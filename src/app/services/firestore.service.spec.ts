@@ -201,23 +201,23 @@ describe('FirestoreService', () => {
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
-	it('should have a function for removing a workbook that calls the appropriate AngularFirestore function when a truthy string arg is passed', () => {
+	it('should have a function for deleting a workbook that calls the appropriate AngularFirestore function when a truthy string arg is passed', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'delete').and.callThrough();
 		let truthyID = 'someID';
 		expect(truthyID).toBeTruthy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
-		service.removeWorkbook(truthyID);
+		service.deleteWorkbook(truthyID);
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a function for removing a workbook that does not call the appropriate AngularFirestore function when a falsy string arg is passed', () => {
+	it('should have a function for deleting a workbook that does not call the appropriate AngularFirestore function when a falsy string arg is passed', () => {
 		let afs = TestBed.get(AngularFirestore);
 		let afsSpy = spyOn(afs, 'delete').and.callThrough();
 		let falsyID = '';
 		expect(falsyID).toBeFalsy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
-		service.removeWorkbook(falsyID);
+		service.deleteWorkbook(falsyID);
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
@@ -310,23 +310,23 @@ describe('FirestoreService', () => {
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a function for adding a new sheet to the data base with the corresoponding firestore function when valid ID and data arguments are passed', async () => {
+	it('should have a function for deleting a sheet in the data base with the corresoponding firestore function when valid ID and data arguments are passed', async () => {
 		let afs = TestBed.get(AngularFirestore);
 		let fsSpy = spyOn(afs, 'delete').and.callThrough();
 
-		expect(service.removeSheet).toBeTruthy();
-		expect(typeof service.removeSheet).toEqual('function');
+		expect(service.deleteSheet).toBeTruthy();
+		expect(typeof service.deleteSheet).toEqual('function');
 		expect(fsSpy).toHaveBeenCalledTimes(0);
 
-		service.removeSheet('some_id', 'some_other_id');
+		service.deleteSheet('some_id', 'some_other_id');
 
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 
-		service.removeSheet('', 'some_other_id');
+		service.deleteSheet('', 'some_other_id');
 
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 
-		service.removeSheet('some_id', '');
+		service.deleteSheet('some_id', '');
 
 		expect(fsSpy).toHaveBeenCalledTimes(1);
 	});

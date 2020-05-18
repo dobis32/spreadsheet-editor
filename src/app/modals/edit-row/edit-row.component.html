@@ -11,7 +11,7 @@
             <input class="ml-2" type="{{headerField.text ? 'text' : 'number'}}" name="{{headerField.name}}" formControlName="{{headerField.name}}">
         </div>
         <div class="row mb-3">
-            <button id="save-row-button" class="ml-3 mt-3">Save</button>
+            <button id="save-row-button" class="ml-3 mt-3 btn btn-primary">Save</button>
         </div>
         <div class="row">
             <h4 *ngIf="updateFailure" class="error-message">Action failed. Try again.</h4>
@@ -20,7 +20,7 @@
   </div>
   <div class="modal-footer">
       <div class="row">
-          <button class="ml-3 mt-3" (click)="deleteRow(rowToEdit)">Delete</button>
+          <button class="ml-3 mt-3 btn btn-outline-danger" (click)="confirmDelete(rowToEdit)">Delete</button>
       </div>
   </div>
   

@@ -24,7 +24,7 @@ class MockFirestoreService {
 		return Promise.resolve(true);
 	}
 
-	removeWorkbook(id: string) {
+	deleteWorkbook(id: string) {
 		return Promise.resolve(true);
 	}
 }
@@ -95,21 +95,21 @@ describe('WorkbookListComponent', () => {
 		expect(formResetSpy).toHaveBeenCalled();
 	});
 
-	it('should have a removeBook function that calls the appropriate FirestoreService function when a truthy ID arg is passed', async () => {
+	it('should have a function to delete a workbook that calls the appropriate FirestoreService function when a truthy ID arg is passed', async () => {
 		let truthyID = 'someID';
-		let afsSpy = spyOn(TestBed.get(FirestoreService), 'removeWorkbook').and.callThrough();
+		let afsSpy = spyOn(TestBed.get(FirestoreService), 'deleteWorkbook').and.callThrough();
 		expect(truthyID).toBeTruthy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
-		await component.removeWorkbook(truthyID);
+		await component.deleteWorkbook(truthyID);
 		expect(afsSpy).toHaveBeenCalledTimes(1);
 	});
 
-	it('should have a removeBook function that does not call the appropriate FirestoreService function when a falsy ID arg is passed', async () => {
+	it('should have a function to delete a workbook that does not call the appropriate FirestoreService function when a falsy ID arg is passed', async () => {
 		let falsyID = '';
-		let afsSpy = spyOn(TestBed.get(FirestoreService), 'removeWorkbook').and.callThrough();
+		let afsSpy = spyOn(TestBed.get(FirestoreService), 'deleteWorkbook').and.callThrough();
 		expect(falsyID).toBeFalsy();
 		expect(afsSpy).toHaveBeenCalledTimes(0);
-		await component.removeWorkbook(falsyID);
+		await component.deleteWorkbook(falsyID);
 		expect(afsSpy).toHaveBeenCalledTimes(0);
 	});
 
