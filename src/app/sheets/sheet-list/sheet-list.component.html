@@ -1,21 +1,30 @@
-<h1>Sheets List</h1>
-<hr>
-<h3>Sheets</h3>
-<ul>
-    <li *ngFor="let sheet of sheets">
-        {{sheet.name}}    
-        <button (click)="removeSheet(workbookId, sheet.id)">Remove</button>
-        <button (click)="editSheet(workbookId, sheet.id)">Edit</button>
-        <button (click)="viewSheet(workbookId, sheet.id)">View</button>
-    </li>
-</ul>
-<hr>
-<h3>Add sheet</h3>
-<h5>Sheet name:</h5>
-<form [formGroup]="sheetForm" (ngSubmit)="addSheet(sheetForm)">
-    <label for="name">Name</label>
-    <input type="text" formControlName="name">
-    <button>Add</button>
-    <h3 *ngIf="invalidSheetForm" class="error-message">Invalid name</h3>
-</form>
-<button (click)="signOut()">sign out</button> temporary 
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12 p-5 mt-5 custom-card">
+            <h1>Sheets List</h1>
+            <hr>
+            <ul>
+                <li *ngFor="let sheet of sheets">
+                    <div class="d-flex mb-3">
+                        <h5 class="mr-auto mt-2">{{ sheet.name }}</h5>
+                        <button class="btn btn-primary view-button ml-2" (click)="viewSheet(workbookId, sheet.id)">View</button>
+                        <button class="btn btn-outline-primary edit-button ml-2" (click)="editSheet(workbookId, sheet.id)">Edit</button>
+                        <button class="btn btn-outline-danger remove-button ml-2" (click)="removeSheet(workbookId, sheet.id)">Remove</button>
+                    </div>   
+                </li>
+            </ul>
+            <hr>
+            <h3>Add sheet</h3>
+            <form [formGroup]="sheetForm" (ngSubmit)="addSheet(sheetForm)">
+                <label for="name">Name</label>
+                <div>
+                    <input type="text" formControlName="name">
+                </div>
+                <button class="btn btn-primary mt-3">Add</button>
+            </form>
+            <h3 *ngIf="invalidSheetForm" class="error-message mt-3">Invalid name</h3>
+            <hr>
+            <button class="btn btn-primary mt-3" (click)="signOut()">sign out</button> temporary 
+        </div>
+    </div>
+</div>

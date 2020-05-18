@@ -1,22 +1,31 @@
-<h1 id="workbook-list-heading">Workbook List</h1>
-<hr>
-<h3>Workbooks</h3>
-<ul id="workbooks-list">
-    <li *ngFor="let workbook of workbooks" class="workbook-listing">
-        {{ workbook.name }} 
-        <button class="remove-button" (click)="removeWorkbook(workbook.id)">Remove</button>
-        <button class="edit-button" (click)="editWorkbook(workbook.id)">Edit</button>
-        <button class="view-button" (click)="viewWorkbook(workbook.id)">View</button>
-    </li>
-</ul>
-<hr>
-<h3>Add Workbook</h3>
-<h5>Workbook name:</h5>
-<form id="add-workbook-form" [formGroup]="workbookForm" (ngSubmit)="addWorkbook(workbookForm)">
-    <label for="name">Name</label>
-    <input id="name" type="text" formControlName="name">
-    <button id="add-workbook-button">Add</button>
-</form>
-<h3 *ngIf="addWorkbookFailure" class="error-message">Invalid workbook name.</h3>
-<button (click)="signOut()">sign out</button> temporary 
-<!-- <button (click)="signIn()">sign in</button> temporary -->
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12 p-5 mt-5 custom-card">
+            <h1 id="workbook-list-heading">Workbook List</h1>
+            <hr>
+            <ul id="workbooks-list">
+                <li *ngFor="let workbook of workbooks" class="workbook-listing">
+                    <div class="d-flex mb-3">
+                        <h5 class="mr-auto mt-2">{{ workbook.name }}</h5>
+                        <button class="btn btn-primary view-button ml-2" (click)="viewWorkbook(workbook.id)">View</button>
+                        <button class="btn btn-outline-primary edit-button ml-2" (click)="editWorkbook(workbook.id)">Edit</button>
+                        <button class="btn btn-outline-danger remove-button ml-2" (click)="removeWorkbook(workbook.id)">Remove</button>
+                    </div>
+                </li>
+            </ul>
+            <hr>
+            <h3>Add Workbook</h3>
+            <form id="add-workbook-form" [formGroup]="workbookForm" (ngSubmit)="addWorkbook(workbookForm)">
+                <label for="name">Name</label>
+                <input id="name" type="text" formControlName="name">
+                <div>
+                    <button class="btn btn-primary mt-3" id="add-workbook-button">Add</button>
+                </div>
+            </form>
+            <h3 *ngIf="addWorkbookFailure" class="error-message">Invalid workbook name.</h3>
+            <hr>
+            <button class="btn btn-primary" (click)="signOut()">sign out</button> temporary 
+            <!-- <button (click)="signIn()">sign in</button> temporary -->
+        </div>
+    </div>
+</div>

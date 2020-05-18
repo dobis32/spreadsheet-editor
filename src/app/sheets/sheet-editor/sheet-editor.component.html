@@ -1,37 +1,49 @@
-<h1>Sheet Editor</h1>
-<hr>
-<h3>Name:</h3>
-<form [formGroup]="nameForm" (ngSubmit)="updateSheetName(nameForm)">
-    <input type="text" formControlName="name">
-    <button>Save</button>
-    <h3 class="error-message" *ngIf="invalidNameForm">Invalid name.</h3>
-    <h3 class="error-message" *ngIf="nameUpdateFailure">Failed to update name.</h3>
-    <h3 class="success-message" *ngIf="nameUpdateSuccess">Name updated successfully.</h3>
-</form>
-<h3>Header Fields:</h3>
-<button id="add-header-field-button" (click)="openEditFieldModal()">Add</button>
-<ul *ngIf="currentSheet">
-    <li *ngFor="let headerField of currentSheet.headerFields">
-        {{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}
-        <button (click)="openEditFieldModal(headerField)">Edit</button>
-    </li>
-</ul>
-<hr>
-<h3>Rows:</h3>        
-<button (click)="openEditRowModal()">Add</button>
-<table *ngIf="currentSheet">
-    <tr>
-        <th class="default-header-fields" *ngFor="let headerField of currentSheet.headerFields">
-            {{ headerField.name }}
-        </th>
-    </tr>
-    <tr class="default-rows" *ngFor="let row of currentSheet.rows">
-        <td *ngFor="let headerField of currentSheet.headerFields">
-           {{row[headerField.name]}}
-        </td>
-        <td>
-            <button (click)="openEditRowModal(row)">Edit</button>
-        </td>
-    </tr>
-</table>
-<hr>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12 p-5 mt-5 custom-card">
+            <h1>Sheet Editor</h1>
+            <hr>
+            <h3>Name</h3>
+            <form [formGroup]="nameForm" (ngSubmit)="updateSheetName(nameForm)">
+                <input type="text" formControlName="name">
+                <div>
+                    <button class="btn btn-primary mt-2">Save</button>
+                </div>
+                <h3 class="error-message mt-3" *ngIf="invalidNameForm">Invalid name.</h3>
+                <h3 class="error-message mt-3" *ngIf="nameUpdateFailure">Failed to update name.</h3>
+                <h3 class="success-message mt-3" *ngIf="nameUpdateSuccess">Name updated successfully.</h3>
+            </form>
+            <hr>
+            <h3>Header Fields</h3>
+            <button class="btn btn-primary mt-2 mb-2" id="add-header-field-button" (click)="openEditFieldModal()">Add</button>
+            <ul *ngIf="currentSheet">
+                <li class="header-field-listing" *ngFor="let headerField of currentSheet.headerFields">
+                    <div class="d-flex mb-3">
+                        <h4 class="mr-auto mt-2">{{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}</h4>
+                        <button class="btn btn-outline-primary mr-5" (click)="openEditFieldModal(headerField)">Edit</button>
+                    </div>
+                </li>
+            </ul>
+            <hr>
+            <h3>Rows</h3>        
+            <button class="btn btn-primary mb-2" (click)="openEditRowModal()">Add</button>
+            <table class="table" *ngIf="currentSheet">
+                <tr>
+                    <th class="default-header-fields" *ngFor="let headerField of currentSheet.headerFields">
+                        {{ headerField.name }}
+                    </th>
+                </tr>
+                <tr class="default-rows" *ngFor="let row of currentSheet.rows">
+                    <td class="pt-4" *ngFor="let headerField of currentSheet.headerFields">
+                       {{row[headerField.name]}}
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-primary" (click)="openEditRowModal(row)">Edit</button>
+                    </td>
+                </tr>
+            </table>
+            <hr>
+            
+        </div>
+    </div>
+</div>

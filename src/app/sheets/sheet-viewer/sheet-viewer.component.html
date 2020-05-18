@@ -1,12 +1,16 @@
-<h1>Sheet Viewer</h1>
-<hr>
-<table>
-    <tr>
-        <th *ngFor="let headerField of currentSheet.headerFields">{{ headerField.name }}</th>
-    </tr>
-    <tr *ngFor="let row of currentSheet.rows">
-        <td *ngFor="let headerField of currentSheet.headerFields">{{ row[headerField.name] }}</td>
-    </tr>
-</table>
-<hr>
-<button (click)="signOut()">sign out</button> temporary 
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12 p-5 mt-5 custom-card">
+            <h1>Sheet Viewer</h1>
+            <table class="table" *ngIf="currentSheet">
+                <tr>
+                    <th *ngFor="let headerField of currentSheet.headerFields">{{ headerField.name }}</th>
+                </tr>
+                <tr *ngFor="let row of currentSheet.rows">
+                    <td *ngFor="let headerField of currentSheet.headerFields">{{ row[headerField.name] }}</td>
+                </tr>
+            </table>
+            <button class="btn btn-primary mt-3" (click)="signOut()">sign out</button> temporary 
+        </div>
+    </div>
+</div>

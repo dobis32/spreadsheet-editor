@@ -1,37 +1,49 @@
-<h1 id="workbook-editor-heading">Workbook Editor</h1>
-<hr>
-<h3>Name:</h3>
-<form id="name-form" [formGroup]="nameForm" (ngSubmit)="updateWorkbookName(nameForm)">
-    <input id="name-input" type="text" formControlName="name">
-    <button>Save</button>
-    <h3 class="error-message" *ngIf="invalidNameForm">Invalid name.</h3>
-    <h3 class="error-message" *ngIf="nameUpdateFailure">Failed to update name.</h3>
-    <h3 class="success-message" *ngIf="nameUpdateSuccess">Name updated successfully.</h3>
-</form>
-<h3>Default Header Fields:</h3>
-<button id="add-header-field-button" (click)="openEditFieldModal()">Add</button>
-<ul *ngIf="currentWorkbook">
-    <li class="header-field-listing" *ngFor="let headerField of currentWorkbook.headerFields">
-        {{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}
-        <button (click)="openEditFieldModal(headerField)">Edit</button>
-    </li>
-</ul>
-<hr>
-<h3>Default Rows:</h3>        
-<button id="add-row-button" (click)="openEditRowModal()">Add</button>
-<table *ngIf="currentWorkbook">
-    <tr>
-        <th class="default-header-fields" *ngFor="let headerField of currentWorkbook.headerFields">
-            {{ headerField.name }}
-        </th>
-    </tr>
-    <tr class="default-rows" *ngFor="let row of currentWorkbook.rows">
-        <td *ngFor="let headerField of currentWorkbook.headerFields">
-           {{row[headerField.name]}}
-        </td>
-        <td>
-            <button (click)="openEditRowModal(row)">Edit</button>
-        </td>
-    </tr>
-</table>
-<hr>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-sm-12 p-5 mt-5 custom-card">
+            <h1 id="workbook-editor-heading">Workbook Editor</h1>
+            <hr>
+            <h3>Name</h3>
+            <form id="name-form" [formGroup]="nameForm" (ngSubmit)="updateWorkbookName(nameForm)">
+                <input id="name-input" type="text" formControlName="name">
+                <div>
+                    <button class="btn btn-primary mt-2">Save</button>
+                </div>
+                <h3 class="error-message mt-3" *ngIf="invalidNameForm">Invalid name.</h3>
+                <h3 class="error-message mt-3" *ngIf="nameUpdateFailure">Failed to update name.</h3>
+                <h3 class="success-message mt-3" *ngIf="nameUpdateSuccess">Name updated successfully.</h3>
+            </form>
+            <hr>
+            <h3>Default Header Fields</h3>
+            <button class="btn btn-primary mt-2 mb-2" id="add-header-field-button" (click)="openEditFieldModal()">Add</button>
+            <ul *ngIf="currentWorkbook">
+                <li class="header-field-listing" *ngFor="let headerField of currentWorkbook.headerFields">
+                    <div class="d-flex mb-3">
+                        <h4 class="mr-auto mt-2">{{ headerField.name }} | Type: {{ headerField.text ? 'Text' : 'Number'}}</h4>
+                        <button class="btn btn-outline-primary mr-5" (click)="openEditFieldModal(headerField)">Edit</button>
+                    </div>
+                </li>
+            </ul>
+            <hr>
+            <h3>Default Rows</h3>        
+            <button class="btn btn-primary mb-2" id="add-row-button" (click)="openEditRowModal()">Add</button>
+            <table class="table" *ngIf="currentWorkbook">
+                <tr>
+                    <th class="default-header-fields" *ngFor="let headerField of currentWorkbook.headerFields">
+                        {{ headerField.name }}
+                    </th>
+                </tr>
+                <tr class="default-rows" *ngFor="let row of currentWorkbook.rows">
+                    <td class="pt-4" *ngFor="let headerField of currentWorkbook.headerFields">
+                       {{row[headerField.name]}}
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-primary" (click)="openEditRowModal(row)">Edit</button>
+                    </td>
+                </tr>
+            </table>   
+            <hr>
+        </div>
+    </div>
+</div>
+
