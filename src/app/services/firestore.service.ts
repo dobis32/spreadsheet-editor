@@ -38,9 +38,13 @@ export class FirestoreService {
 		try {
 			if (!workbook) throw new Error('Invalid workbook data provided');
 			if (!workbook.uid) throw new Error('No user logged in.');
-			if (isDevMode()) await this.firestore.collection('test_data/test/workbooks').add(workbook);
-			else await this.firestore.collection('workbooks').add(workbook);
-			return true;
+			if (isDevMode()) {
+				const docRef = await this.firestore.collection('test_data/test/workbooks').add(workbook);
+				return docRef.id;
+			} else {
+				const docRef = await this.firestore.collection('workbooks').add(workbook);
+				return docRef.id;
+			}
 		} catch (error) {
 			console.log(error);
 			return false;

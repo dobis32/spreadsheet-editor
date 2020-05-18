@@ -4,6 +4,7 @@ import { FirestoreService } from 'src/app/services/firestore.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { ExcelService } from 'src/app/services/excel.service';
 
 @Component({
 	selector: 'app-workbook-list',
@@ -15,16 +16,22 @@ export class WorkbookListComponent implements OnInit {
 	public workbookForm: FormGroup;
 	public signedInAuth: Subscription;
 	public addWorkbookFailure: boolean;
+	public importWorkbookFailure: boolean;
+	public importNotReady: boolean;
 	public workbookSub: Subscription;
 	public uid: string;
+	public importData: any;
 	constructor(
 		public formBuilder: FormBuilder,
 		public firestoreService: FirestoreService,
 		public route: ActivatedRoute,
-		public router: Router
+		public router: Router,
+		public excelService: ExcelService
 	) {
 		this.workbooks = new Array<any>();
 		this.addWorkbookFailure = false;
+		this.importWorkbookFailure = false;
+		this.importNotReady = true;
 		this.workbookForm = this.formBuilder.group({ name: new FormControl('', [ Validators.required ]) });
 		if (isDevMode()) {
 			this.uid = 'test_uid';
@@ -50,6 +57,42 @@ export class WorkbookListComponent implements OnInit {
 	ngOnDestroy(): void {
 		if (this.signedInAuth) this.signedInAuth.unsubscribe();
 		if (this.workbookSub) this.workbookSub.unsubscribe();
+	}
+
+	async importChange(event: any) {
+		try {
+			this.importData = undefined;
+			this.importNotReady = true;
+			this.importWorkbookFailure = false;
+			const importFile = await this.excelService.importExcelFile(event);
+			console.log(importFile);
+			if (importFile.result) {
+				this.importNotReady = false;
+				this.importData = importFile.data;
+			} else throw new Error('Import failed.');
+		} catch (error) {
+			console.log(error);
+			this.importWorkbookFailure = true;
+		}
+	}
+
+	async importDataToFirestore() {
+		try {
+			if (!this.importData) throw new Error('No data to import');
+			console.log(this.importData);
+			const { workbookDoc, sheetDocs } = <any>this.excelService.formatData(this.importData, this.uid);
+			console.log(workbookDoc, sheetDocs);
+			const workbookId = await this.firestoreService.addWorkbook(workbookDoc);
+			if (!workbookId) throw new Error('Failed to upload workbook to Firestore');
+			sheetDocs.forEach((sheet) => {
+				this.firestoreService.addSheet(workbookId, sheet).catch((error) => {
+					console.log(`Failed to add sheet ${sheet.name} to Firestore`, error);
+				});
+			});
+		} catch (error) {
+			console.log(error);
+			this.importWorkbookFailure = true;
+		}
 	}
 
 	async addWorkbook(fg: FormGroup) {

@@ -24,8 +24,13 @@
             </form>
             <h3 *ngIf="addWorkbookFailure" class="error-message">Invalid workbook name.</h3>
             <hr>
+            <h3>Import Workbook</h3>
+            <input type="file" name="import" (change)="importChange($event)">
+            <div>
+                <button [disabled]="importNotReady" class="btn btn-primary mt-3" id="import-workbook-button" (click)="importDataToFirestore()">Import</button>
+            </div>
+            <hr>
             <button class="btn btn-primary" (click)="signOut()">sign out</button> temporary 
-            <!-- <button (click)="signIn()">sign in</button> temporary -->
         </div>
     </div>
 </div>
