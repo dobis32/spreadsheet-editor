@@ -65,7 +65,6 @@ export class WorkbookListComponent implements OnInit {
 			this.importNotReady = true;
 			this.importWorkbookFailure = false;
 			const importFile = await this.excelService.importExcelFile(event);
-			console.log(importFile);
 			if (importFile.result) {
 				this.importNotReady = false;
 				this.importData = importFile.data;

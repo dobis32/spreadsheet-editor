@@ -7,6 +7,7 @@ import { mockWorkbookCollection, MockWorkBookFactory } from '../../mocks/mockDat
 import { RouterTestingModule } from '@angular/router/testing';
 import { routes } from '../../app-routing.module';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ExcelService } from 'src/app/services/excel.service';
 
 class MockFirestoreService {
 	public signedIn: Observable<any>;
@@ -29,6 +30,12 @@ class MockFirestoreService {
 	}
 }
 
+class MockExcelService {
+	importExcelFile(event: any) {
+		return { result: true, data: [ { value: 'some_Value' } ] };
+	}
+}
+
 describe('WorkbookListComponent', () => {
 	let component: WorkbookListComponent;
 	let fixture: ComponentFixture<WorkbookListComponent>;
@@ -38,7 +45,11 @@ describe('WorkbookListComponent', () => {
 			TestBed.configureTestingModule({
 				imports: [ FormsModule, ReactiveFormsModule, RouterTestingModule.withRoutes(routes) ],
 				declarations: [ WorkbookListComponent ],
-				providers: [ FormBuilder, { provide: FirestoreService, useClass: MockFirestoreService } ]
+				providers: [
+					FormBuilder,
+					{ provide: FirestoreService, useClass: MockFirestoreService },
+					{ provide: ExcelService, useClass: MockExcelService }
+				]
 			}).compileComponents();
 		})
 	);
@@ -61,6 +72,11 @@ describe('WorkbookListComponent', () => {
 	it('should have a Firestore service injected into it', () => {
 		expect(component.firestoreService).toBeTruthy();
 		expect(fixture.debugElement.injector.get(FirestoreService));
+	});
+
+	it('should have an Excel service injected into it', () => {
+		expect(component.excelService).toBeTruthy();
+		expect(fixture.debugElement.injector.get(ExcelService));
 	});
 
 	it('should have a list of workbooks stored as an array', () => {

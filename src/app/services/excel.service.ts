@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-// import * as FileSaver from 'file-saver';
+import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 
 const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
@@ -11,7 +11,24 @@ const EXCEL_EXTENSION = 'xlsx';
 export class ExcelService {
 	constructor() {}
 
-	public formatData(unformattedData: any, uid: string) {
+	public exportAsExcelFile(sheetNames: Array<string>, sheetsData: Array<any>, excelFileName: string): void {
+		const workBook: XLSX.WorkBook = XLSX.utils.book_new();
+		let i = 0;
+		sheetsData.forEach((sheet) => {
+			const workSheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(sheet);
+			XLSX.utils.book_append_sheet(workBook, workSheet, sheetNames[i]);
+			i++;
+		});
+		const excelBuffer: any = XLSX.write(workBook, { bookType: 'xlsx', type: 'array' });
+		this.saveAsExcelFile(excelBuffer, excelFileName);
+	}
+
+	public saveAsExcelFile(buffer: any, fileName: string): void {
+		const data: Blob = new Blob([ buffer ], { type: EXCEL_TYPE });
+		FileSaver.saveAs(data, fileName + '.' + EXCEL_EXTENSION);
+	}
+
+	formatData(unformattedData: any, uid: string) {
 		let workbookDoc = <any>{};
 		let sheetDocs = [];
 		workbookDoc.name = unformattedData.name;
@@ -26,7 +43,7 @@ export class ExcelService {
 		return { workbookDoc, sheetDocs };
 	}
 
-	formatSheet(sheet: any) {
+	private formatSheet(sheet: any) {
 		let formattedSheet = <any>{};
 		// name
 		formattedSheet.name = sheet.name;
@@ -43,7 +60,7 @@ export class ExcelService {
 		return formattedSheet;
 	}
 
-	formatHeaderFields(headerData: Array<string | number>) {
+	private formatHeaderFields(headerData: Array<string | number>) {
 		let headerFields = [];
 		headerData.forEach((data) => {
 			headerFields.push({ name: data, text: true, value: 'None' });
@@ -51,7 +68,7 @@ export class ExcelService {
 		return headerFields;
 	}
 
-	formatRow(headerFields: Array<any>, rowData: Array<any>) {
+	private formatRow(headerFields: Array<any>, rowData: Array<any>) {
 		let row = {};
 		for (let i = 0; i < headerFields.length; i++) {
 			row[headerFields[i].name] = rowData[i + 1] ? rowData[i + 1] : 'None'; // row[0] is really the header field data; do not include

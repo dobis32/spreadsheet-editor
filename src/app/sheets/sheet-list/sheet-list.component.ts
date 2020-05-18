@@ -3,6 +3,7 @@ import { FirestoreService } from 'src/app/services/firestore.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { ExcelService } from 'src/app/services/excel.service';
 
 @Component({
 	selector: 'app-sheet-list',
@@ -15,19 +16,25 @@ export class SheetListComponent implements OnInit {
 	public workbook: any;
 	public signedInAuth: Subscription;
 	public sheetForm: FormGroup;
+	public exportForm: FormGroup;
 	public invalidSheetForm: boolean;
 	public paramSub: Subscription;
 	public workbookSub: Subscription;
 	public sheetSub: Subscription;
 	public uid: string;
+	public exportFailed: boolean;
 	constructor(
 		public firestoreService: FirestoreService,
 		public activatedRoute: ActivatedRoute,
 		public router: Router,
-		public formBuilder: FormBuilder
+		public formBuilder: FormBuilder,
+		public excelService: ExcelService
 	) {
 		this.sheetForm = this.formBuilder.group({
 			name: new FormControl('', [ Validators.required ])
+		});
+		this.exportForm = this.formBuilder.group({
+			fileName: new FormControl('', [ Validators.required, Validators.minLength(1) ])
 		});
 		this.sheets = new Array();
 		this.paramSub = this.activatedRoute.params.subscribe((params) => {
@@ -57,6 +64,52 @@ export class SheetListComponent implements OnInit {
 		if (this.paramSub) this.paramSub.unsubscribe();
 		if (this.workbookSub) this.workbookSub.unsubscribe();
 		if (this.sheetSub) this.sheetSub.unsubscribe();
+	}
+
+	exportWorkbook(fg: FormGroup) {
+		try {
+			this.exportFailed = false;
+
+			if (!fg.valid) throw new Error('Invalid workbook name');
+			else {
+				let sheetNames = this.getSheetNames(this.sheets);
+				let sheetData = [];
+				this.sheets.forEach((sheet) => {
+					sheetData.push(this.getRowsData(sheet));
+				});
+				this.excelService.exportAsExcelFile(sheetNames, sheetData, fg.value.fileName);
+				fg.reset();
+			}
+		} catch (error) {
+			console.log(error);
+			this.exportFailed = true;
+		}
+	}
+
+	getSheetNames(sheets: Array<any>) {
+		let sheetNames = [];
+		sheets.forEach((sheet) => {
+			sheetNames.push(sheet.name);
+		});
+		return sheetNames;
+	}
+
+	getRowsData(sheet: any) {
+		let sheetData = [];
+		let headerFields = [];
+		sheet.headerFields.forEach((field) => {
+			headerFields.push(field.name);
+		});
+		sheetData.push(headerFields);
+		sheet.rows.forEach((row) => {
+			let rowData = [];
+			sheet.headerFields.forEach((field) => {
+				rowData.push(row[field.name]);
+			});
+			sheetData.push(rowData);
+		});
+
+		return sheetData;
 	}
 
 	getWorkbookData(workbookId: string) {

@@ -14,7 +14,7 @@
                 </li>
             </ul>
             <hr>
-            <h3>Add sheet</h3>
+            <h3>Add Sheet</h3>
             <form [formGroup]="sheetForm" (ngSubmit)="addSheet(sheetForm)">
                 <label for="name">Name</label>
                 <div>
@@ -23,6 +23,16 @@
                 <button class="btn btn-primary mt-3">Add</button>
             </form>
             <h3 *ngIf="invalidSheetForm" class="error-message mt-3">Invalid name</h3>
+            <hr>
+            <h3>Export Sheet</h3>
+            <form [formGroup]="exportForm" (ngSubmit)="exportWorkbook(exportForm)">
+                <label for="fileName">Save as</label>
+                <div>
+                    <input type="text" name="fileName" formControlName="fileName">
+                </div>
+                <button>Export Book</button>
+            </form>
+            <h3 *ngIf="exportFailed" class="error-message mt-3">Failed to export workbook.</h3>
             <hr>
             <button class="btn btn-primary mt-3" (click)="signOut()">sign out</button> temporary 
         </div>

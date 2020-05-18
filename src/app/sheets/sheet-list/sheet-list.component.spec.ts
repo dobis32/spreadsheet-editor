@@ -7,6 +7,7 @@ import { of, Observable } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder } from '@angular/forms';
 import { MockWorkBookFactory } from '../../mocks/mockData';
+import { ExcelService } from 'src/app/services/excel.service';
 
 class MockFirestoreService {
 	public signedIn: Observable<any>;
@@ -65,6 +66,10 @@ class MockRouter {
 	}
 }
 
+class MockExcelService {
+	exportAsExcelFile(sheetNames: Array<string>, sheetsData: Array<any>, excelFileName: string) {}
+}
+
 describe('SheetListComponent', () => {
 	let component: SheetListComponent;
 	let fixture: ComponentFixture<SheetListComponent>;
@@ -78,7 +83,8 @@ describe('SheetListComponent', () => {
 					FormBuilder,
 					{ provide: Router, useClass: MockRouter },
 					{ provide: FirestoreService, useClass: MockFirestoreService },
-					{ provide: ActivatedRoute, useClass: MockActivatedRoute }
+					{ provide: ActivatedRoute, useClass: MockActivatedRoute },
+					{ provide: ExcelService, useClass: MockExcelService }
 				]
 			}).compileComponents();
 		})
@@ -107,6 +113,11 @@ describe('SheetListComponent', () => {
 	it('should have an Router injected into it', () => {
 		expect(component.router).toBeTruthy();
 		expect(fixture.debugElement.injector.get(Router));
+	});
+
+	it('should have the excel service injected into it', () => {
+		expect(component.excelService).toBeTruthy();
+		expect(fixture.debugElement.injector.get(ExcelService));
 	});
 
 	it('should have the current workbook ID', () => {
